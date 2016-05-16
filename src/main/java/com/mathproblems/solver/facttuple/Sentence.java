@@ -1,6 +1,7 @@
 package com.mathproblems.solver.facttuple;
 
 import com.mathproblems.solver.Clause;
+import com.mathproblems.solver.Proposition;
 import com.mathproblems.solver.partsofspeech.Adjective;
 import com.mathproblems.solver.partsofspeech.Noun;
 import com.mathproblems.solver.partsofspeech.Verb;
@@ -19,7 +20,7 @@ public class Sentence {
     private final LinkedHashSet<Adjective> adjectives;
     private final LinkedHashSet<Verb> verbs;
     private final LinkedHashSet<Clause> clauses;
-    private final LinkedHashSet<String> propositions;
+    private final LinkedHashSet<Proposition> propositions;
     private boolean isEnquiry;
     private static final String CLAUSE_PREFIX = "Clause:";
     private static final String PROPOSITION_PREFIX = "Proposition:";
@@ -45,7 +46,7 @@ public class Sentence {
                     clauses.add(new Clause(line));
                 } else if(line.startsWith(PROPOSITION_PREFIX)) {
                     line = line.replace(PROPOSITION_PREFIX, "");
-                    propositions.add(line);
+                    propositions.add(new Proposition(line));
                 }
             }
             bufferedReader.close();
