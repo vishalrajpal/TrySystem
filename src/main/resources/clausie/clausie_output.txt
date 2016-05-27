@@ -1,0 +1,521 @@
+Sentence:For Halloween Debby and her sister combined the candy they received. Debby had 32 pieces of candy while her sister had 42. If they ate 35 pieces the first night, how many pieces do they have left?
+Clause:SVO (S: her@5, V: "has", O: sister@6)
+Clause:SVO (V: combined@7, S: Debby@3, O: candy@9)
+Clause:SVO (V: received@11, S: they@10, O: candy@9)
+Clause:SVO (V: had@14, S: Debby@13, O: pieces@16, A?: had@22)
+Clause:SVO (S: her@20, V: "has", O: sister@21)
+Clause:SVO (V: had@22, S: sister@21, O: 42@23)
+Clause:SVO (V: ate@27, S: they@26, O: pieces@29, A?: night@32)
+Clause:SV (V: do@37, S: pieces@36)
+Clause:SV (V: left@40, S: they@38, A?: combined@7)
+Proposition:	"she"	"has"	"sister"
+Proposition:	"Halloween Debby and she sister"	"combine"	"the candy"
+Proposition:	"they"	"receive"	"the candy"
+Proposition:	"Debby"	"have"	"32 piece of candy"
+Proposition:	"she"	"has"	"sister"
+Proposition:	"she sister"	"have"	"42"
+Proposition:	"they"	"eat"	"35 piece"
+Proposition:	"piece"	"do"
+Proposition:	"they"	"have leave"
+Sentence:A pet store had 13 siamese cats and 5 house cats. During a sale they sold 10 cats. How many cats do they have left?
+Clause:SVO (V: had@4, S: store@3, O: cats@7)
+Clause:SVO (V: sold@17, S: they@16, A?: During@13, O: cats@19)
+Clause:SVO (V: do@24, S: cats@23, CCOMP: left@27)
+Clause:SV (V: left@27, S: they@25)
+Proposition:	"a pet store"	"have"	"13 siamese cat and 5 house cats during a sale they sell 10 cat"
+Proposition:	"they"	"sell"	"10 cat"
+Proposition:	"cat"	"do"	"they have leave"
+Proposition:	"they"	"have leave"
+Sentence:The school cafeteria ordered 42 red apples and 7 green apples for students lunches. But, if only 9 students wanted fruit, how many extra did the cafeteria end up with?
+Clause:SVO (V: ordered@4, S: cafeteria@3, O: apples@7, A?: for@12)
+Clause:SVO (V: wanted@22, S: students@21, O: fruit@23)
+Clause:SVO (V: did@28, S: extra@27, O: end@31, A?: with@33)
+Proposition:	"the school cafeteria"	"order"	"42 red apple and 7 green apple"
+Proposition:	"only 9 student"	"want"	"fruit"
+Proposition:	"extra"	"do up"	"the cafeteria end"
+Sentence:Lana picked 36 tulips and 37 roses to make flower bouquets. If she only used 70 of the flowers though, how many extra flowers did Lana pick?
+Clause:SVO (V: picked@2, S: Lana@1, CCOMP: make@9)
+Clause:SVO (V: make@9, S: tulips@4, O: bouquets@11)
+Clause:SVO (V: used@16, S: she@14, A?: only@15, O: 70@17, A?: though@21)
+Clause:SVO (V: did@27, S: flowers@26, CCOMP: pick@29)
+Clause:SV (V: pick@29, S: Lana@28)
+Proposition:	"Lana"	"pick"	"36 tulip and 37 rose to make flower bouquet"
+Proposition:	"36 tulip and 37 rose"	"to make"	"flower bouquet"
+Proposition:	"she"	"use"	"70 of the flower"
+Proposition:	"extra flower"	"do"	"Lana pick"
+Proposition:	"Lana"	"pick"
+Sentence:Carol and her mom were picking carrots from their garden. Carol picked 29 and her mother picked 16. If only 38 of the carrots were good, how many bad carrots did they have?
+Clause:SVO (S: her@3, V: "has", O: mom@4)
+Clause:SVO (V: picking@6, S: Carol@1, O: carrots@7)
+Clause:SVO (S: their@9, V: "has", O: garden@10)
+Clause:SVOO (V: picked@13, S: Carol@12, O: 29@14, IO: carrots@7)
+Clause:SVO (S: her@16, V: "has", O: mother@17)
+Clause:SVO (V: picked@18, S: mother@17, O: 16@19)
+Clause:SVC (C: good@28, V: were@27, S: 38@23, CCOMP: did@34)
+Clause:SVO (V: did@34, S: carrots@33, CCOMP: have@36)
+Clause:SV (V: have@36, S: they@35)
+Proposition:	"she"	"has"	"mom"
+Proposition:	"Carol and she mom"	"be pick"	"carrot"
+Proposition:	"they"	"has"	"garden"
+Proposition:	"Carol"	"pick"	"29 carrot"
+Proposition:	"she"	"has"	"mother"
+Proposition:	"she mother"	"pick"	"16"
+Proposition:	"only 38 of the carrot"	"be"	"good how many bad carrot do they have"
+Proposition:	"bad carrot"	"do"	"they have"
+Proposition:	"they"	"have"
+Sentence:Roger had 16 dollars. For his birthday he got 28 more dollars but spent 25 on a new game. How much money does he have now?
+Clause:SVOC (V: had@2, S: Roger@1, O: dollars@4, CCOMP: have@27)
+Clause:SVO (S: his@7, V: "has", O: birthday@8)
+Clause:SVOO (V: got@10, S: he@9, O: dollars@13, IO: birthday@8)
+Clause:SVOO (V: spent@15, S: he@9, O: 25@16, A?: on@17, IO: birthday@8)
+Clause:SVOO (V: does@25, S: money@24, O: he@26, IO: birthday@8)
+Clause:SV (V: have@27, S: birthday@8, A?: now@28)
+Proposition:	"Roger"	"have"	"16 dollar he birthday have now"
+Proposition:	"he"	"has"	"birthday"
+Proposition:	"he"	"get"	"28 more dollar he birthday"
+Proposition:	"he"	"spend"	"25 he birthday"
+Proposition:	"how much money"	"do"	"he he birthday"
+Proposition:	"he birthday"	"have"
+Sentence:Rachel bought two coloring books. One had 23 pictures and the other had 32. After one week she had already colored 44 of the pictures. How many pictures does she still have to color?
+Clause:SVO (V: bought@2, S: Rachel@1, O: books@5)
+Clause:SVO (V: had@8, S: One@7, O: pictures@10)
+Clause:SVO (V: colored@23, S: she@20, A?: After@17, A?: week@19, A?: already@22, O: 44@24)
+Clause:SVO (V: does@32, S: pictures@31, CCOMP: to@36)
+Clause:SV (V: to@36, S: she@33, A?: still@34, A?: color@37)
+Proposition:	"Rachel"	"buy"	"two coloring book"
+Proposition:	"one"	"have"	"23 picture and the other after one week she have already color 44 of the picture"
+Proposition:	"she"	"have color"	"44 of the picture"
+Proposition:	"picture"	"do"	"she still have to color"
+Proposition:	"she"	"have to"
+Sentence:Ned had to wash 9 short sleeve shirts and 21 long sleeve shirts before school. If he had only washed 29 of them by the time school started, how many did he not wash?
+Clause:SVO (V: had@2, S: Ned@1, XCOMP: wash@4, A?: washed@21)
+Clause:SVO (V: washed@21, S: he@18, A?: only@20, O: 29@22, A?: by@25)
+Clause:SV (V: wash@36, S: he@34)
+Proposition:	"Ned"	"have"	"to wash 9 short sleeve shirt and 21 long sleeve shirt"
+Proposition:	"he"	"have wash"	"29 of they"
+Proposition:	"he"	"do not wash"
+Sentence:Faye had 46 math problems and 9 science problems for homework. If she finished 40 of the problems at school, how many problems did she have to do for homework?
+Clause:SVO (V: had@2, S: Faye@1, O: problems@5)
+Clause:SVO (V: finished@15, S: she@14, O: 40@16, A?: at@20)
+Clause:SVO (V: did@26, S: problems@25, CCOMP: have@28)
+Clause:SVO (V: have@28, S: she@27, XCOMP: do@30)
+Proposition:	"Faye"	"have"	"46 math problem and 9 science problem for homework if she finish 40 of the problem at school how many problem do she have to do for homework"
+Proposition:	"she"	"finish"	"40 of the problem"
+Proposition:	"problem"	"do"	"she have to do for homework"
+Proposition:	"she"	"have"	"to do for homework"
+Sentence:Amy had 4 music files and 21 video files on her flash drive. If she deleted 23 of the files, how many files were still on her flash drive?
+Clause:SVO (V: had@2, S: Amy@1, O: files@5)
+Clause:SV (V: files@9, S: video@8, A?: on@10)
+Clause:SVO (S: her@11, V: "has", O: drive@13)
+Clause:SVO (V: deleted@17, S: she@16, O: 23@18)
+Clause:SVA (V: were@26, S: files@25, A!: still@27, A?: on@28)
+Clause:SVO (S: her@29, V: "has", O: drive@31)
+Proposition:	"Amy"	"have"	"4 music file"
+Proposition:	"21 video"	"file"
+Proposition:	"she"	"has"	"flash drive"
+Proposition:	"she"	"delete"	"23 of the file"
+Proposition:	"file"	"be"	"still"
+Proposition:	"she"	"has"	"flash drive"
+Sentence:At the arcade, Tom won 32 tickets playing 'whack a mole' and 25 tickets playing 'skee ball'. If he spent 7 of his tickets on a hat, how many tickets does Tom have left?
+Clause:SVO (V: won@6, S: Tom@5, A?: At@1, CCOMP: whack@11)
+Clause:SV (V: whack@11, S: tickets@8)
+Clause:SVO (V: playing@18, S: mole@13, O: ball@21)
+Clause:SVO (V: spent@26, S: he@25, O: 7@27, A?: on@31)
+Clause:SVO (S: his@29, V: "has", O: tickets@30)
+Clause:SVO (V: does@38, S: tickets@37, CCOMP: left@41)
+Clause:SV (V: left@41, S: Tom@39)
+Proposition:	"Tom"	"win"	"32 ticket play whack a mole and 25 ticket play skee ball"
+Proposition:	"32 ticket play"	"whack"
+Proposition:	"a mole and 25 ticket"	"play"	"skee ball"
+Proposition:	"he"	"spend"	"7 of he ticket"
+Proposition:	"he"	"has"	"ticket"
+Proposition:	"ticket"	"do"	"Tom have leave"
+Proposition:	"Tom"	"have leave"
+Sentence:There were 39 girls and 4 boys trying out for the schools basketball team. If only 26 of them got called back, how many students didn't make the cut?
+Clause:EXISTENTIAL (V: were@2, S: girls@4)
+Clause:SV (V: called@22, S: 26@18, A?: back@23)
+Clause:SVO (V: make@30, S: students@27, O: cut@32)
+Proposition:	"39 girl and 4 boy try out for the school basketball team if only 26 of they get call back"	"there be"
+Proposition:	"only 26 of they"	"get call"
+Proposition:	"how many student"	"do not make"	"the cut"
+Sentence:At the schools book fair Sam bought 13 adventure books and 17 mystery books. If 15 of the books were used, how many new books did he buy?
+Clause:SVO (V: bought@7, S: Sam@6, A?: At@1, O: books@10)
+Clause:SV (V: used@22, S: 15@17)
+Clause:SVO (V: did@28, S: books@27, CCOMP: buy@30)
+Clause:SV (V: buy@30, S: he@29)
+Proposition:	"Sam"	"buy"	"13 adventure book and 17 mystery book if 15 of the book be use how many new book do he buy"
+Proposition:	"15 of the book"	"be use"
+Proposition:	"new book"	"do"	"he buy"
+Proposition:	"he"	"buy"
+Sentence:Edward started his own lawn mowing business. In the spring he made 2 dollars mowing lawns and in the summer he made 27 dollars. If he had to spend 5 dollars buying supplies, how much money did he end up with?
+Clause:SVO (V: started@2, S: Edward@1, O: lawn@5, A?: had@29)
+Clause:SVO (S: his@3, V: "has", O: lawn@5)
+Clause:SVOO (V: made@13, S: he@12, O: lawns@17, IO: spring@11)
+Clause:SVO (V: made@23, S: he@22, A?: in@19, O: dollars@25)
+Clause:SVO (V: had@29, S: he@28, XCOMP: spend@31)
+Clause:SVO (V: did@40, S: money@39, CCOMP: end@42)
+Clause:SV (V: end@42, S: he@41, A?: with@44)
+Proposition:	"Edward"	"start"	"he own lawn mowing business in the spring"
+Proposition:	"he"	"has"	"own lawn mowing business in the spring"
+Proposition:	"he"	"make"	"2 dollar mow lawn the spring"
+Proposition:	"he"	"make"	"27 dollar"
+Proposition:	"he"	"have"	"to spend 5 dollar buy supplies"
+Proposition:	"how much money"	"do"	"he end up with"
+Proposition:	"he"	"end up"
+Sentence:While shopping, Maria bought 35 green towels and 21 white towels. If she gave her mother 34 of them, how many towels did Maria end up with?
+Clause:SVC (S: shopping@2, V: "is", C: Maria@4)
+Clause:SVO (V: bought@5, S: shopping@2, O: towels@8)
+Clause:SVO (V: gave@16, S: she@15, O: 34@19)
+Clause:SVO (S: her@17, V: "has", O: mother@18)
+Clause:SV (V: end@28, S: Maria@27, A?: bought@5, A?: with@30)
+Proposition:	"shopping"	"is"	"Maria"
+Proposition:	"shopping"	"buy"	"35 green towel and 21 white towel if she give she mother 34 of they"
+Proposition:	"she"	"give"	"34 of they"
+Proposition:	"she"	"has"	"mother"
+Proposition:	"Maria"	"do end up"
+Sentence:A waiter at 'The Greasy Spoon' restaurant had 29 customers to wait on. During the lunch rush he added another 20 customers. If 34 of the customers didn't leave him a tip, how many customers did leave a tip?
+Clause:SVO (S: Spoon@7, V: "has", O: restaurant@9)
+Clause:SVO (V: had@10, S: waiter@2, CCOMP: wait@14, A?: leave@34)
+Clause:SV (V: wait@14, S: customers@12)
+Clause:SVOO (V: added@22, S: he@21, O: customers@25, IO: rush@20)
+Clause:SVOO (V: leave@34, S: 34@28, IO: him@35, O: tip@37)
+Clause:SVO (V: leave@43, S: customers@41, O: tip@45)
+Proposition:	"the Greasy Spoon"	"has"	"restaurant"
+Proposition:	"a waiter at the Greasy Spoon restaurant"	"have"	"29 customer to wait on during the lunch rush"
+Proposition:	"29 customer"	"to wait"
+Proposition:	"he"	"add"	"another 20 customer the lunch rush"
+Proposition:	"34 of the customer"	"do not leave"	"he a tip"
+Proposition:	"how many customer"	"do leave"	"a tip"
+Sentence:For the school bake sale Carol made 30 cupcakes. If she sold 9 of them and then made 28 more, how many cupcakes would she have?
+Clause:SVO (V: made@7, S: Carol@6, O: 30@8)
+Clause:SVO (V: sold@13, S: she@12, O: 9@14)
+Clause:SVO (V: made@19, S: she@12, A-: then@18, A?: more@21, CCOMP: would@26)
+Clause:SV (V: would@26, S: cupcakes@25)
+Clause:SV (V: have@28, S: she@27, A?: For@1)
+Proposition:	"Carol"	"make"	"30"
+Proposition:	"she"	"sell"	"9 of they"
+Proposition:	"she"	"make"	"how many cupcake would"
+Proposition:	"cupcake"	"would"
+Proposition:	"she"	"have"
+Sentence:A book store had 41 books in the bargin bin. If they sold 33 books, but then put 2 more in the bin, how many books would be in the bin?
+Clause:SVO (V: had@4, S: store@3, O: books@6, A?: in@7, A?: sold@14)
+Clause:SVOA (V: put@20, S: store@3, A-: then@19, A!: in@23, CCOMP: be@31)
+Clause:SVO (V: sold@14, S: they@13, O: books@16)
+Clause:SVA (V: be@31, S: books@29, A!: in@32)
+Proposition:	"a book store"	"have"	"41 book"
+Proposition:	"a book store"	"put"	"2 more in the bin how many book would be in the bin"
+Proposition:	"they"	"sell"	"33 book"
+Proposition:	"book"	"would be"	"in the bin"
+Sentence:At the fair there were 9 people in line for the bumper cars. If 6 of them got tired of waiting and left and 3 more got in line, how many people would be in line?
+Clause:EXISTENTIAL (V: were@5, S: people@7, A?: At@1)
+Clause:SV (V: tired@20, S: 6@16, A?: of@21)
+Clause:SV (V: left@24, S: 6@16)
+Clause:SVA (V: got@28, S: tired@20, A!: in@29)
+Clause:SVA (V: be@36, S: people@34, A!: in@37)
+Proposition:	"9 people"	"there be"
+Proposition:	"6 of they"	"tired"
+Proposition:	"6 of they"	"3 more"
+Proposition:	"6 of they"	"leave"
+Proposition:	"if 6 of they get tired of wait and leave and 3 more"	"in line for the bumper car get"	"in line"
+Proposition:	"how many people"	"would be"	"in line"
+Sentence:Paige had 8 songs on her mp3 player. If she deleted 5 old songs from it and then added 30 new songs, how many songs does she have on her mp3 player?
+Clause:SVO (S: her@6, V: "has", O: player@8)
+Clause:SVO (V: deleted@12, S: she@11, O: songs@15, A?: from@16)
+Clause:SVO (V: have@30, S: she@29, O: songs@27, A?: on@31)
+Clause:SVO (S: her@32, V: "has", O: player@34)
+Proposition:	"she"	"has"	"mp3 player"
+Proposition:	"she"	"delete"	"5 old song"
+Proposition:	"she"	"do have"	"how many song"
+Proposition:	"she"	"has"	"mp3 player"
+Sentence:Tiffany was playing a video game and had 43 lives. In a hard part of the game she lost 14 lives. If she got 27 more lives in the next level, how many lives would she have?
+Clause:SVO (V: playing@3, S: Tiffany@1, O: game@6, A?: got@26)
+Clause:SVO (V: had@8, S: Tiffany@1, O: 43@9, A?: got@26)
+Clause:SVO (V: lost@20, S: she@19, A?: In@12, O: lives@22)
+Clause:SVOA (V: got@26, S: she@25, O: lives@29, A!: in@30)
+Clause:SVO (V: have@40, S: she@39, O: lives@37)
+Proposition:	"tiffany"	"be play"	"a video game"
+Proposition:	"tiffany"	"have"	"43 lives in a hard part of the game she lose 14 life"
+Proposition:	"she"	"lose"	"14 life"
+Proposition:	"she"	"get"	"27 more life in the next level"
+Proposition:	"she"	"would have"	"how many life"
+Sentence:Maria had 14 bottles of water in her fridge. If she drank 8 of them and then bought 45 more, how many bottles would she have?
+Clause:SVO (V: had@2, S: Maria@1, O: bottles@4)
+Clause:SVO (V: bought@19, S: Maria@1, A-: then@18, O: more@21)
+Clause:SVO (S: her@8, V: "has", O: fridge@9)
+Clause:SVO (V: drank@13, S: she@12, O: 8@14)
+Clause:SVO (V: have@28, S: she@27, O: bottles@25)
+Proposition:	"maria"	"have"	"14 bottle of water"
+Proposition:	"maria"	"buy"	"45 more"
+Proposition:	"she"	"has"	"fridge"
+Proposition:	"she"	"drink"	"8 of they"
+Proposition:	"she"	"would have"	"how many bottle"
+Sentence:At the town carnival Billy rode the ferris wheel 7 times and the bumper cars 3 times. If each ride cost 5 tickets, how many tickets did he use?
+Clause:SV (V: rode@6, S: Billy@5, A?: At@1)
+Clause:SVO (V: cost@22, S: ride@21, O: tickets@24)
+Clause:SVO (V: did@29, S: tickets@28, CCOMP: use@31)
+Clause:SV (V: use@31, S: he@30)
+Proposition:	"Billy"	"ride"
+Proposition:	"each ride"	"cost"	"5 ticket"
+Proposition:	"ticket"	"do"	"he use"
+Proposition:	"he"	"use"
+Sentence:Chloe was unboxing some of her old winter clothes. She found 4 boxes of clothing and inside each box there were 2 scarves and 6 mittens. How many pieces of winter clothing did Chloe have total?
+Clause:SVO (V: unboxing@3, S: Chloe@1, O: some@4)
+Clause:SVO (S: her@6, V: "has", O: clothes@9)
+Clause:SVO (V: found@12, S: She@11, CCOMP: did@35)
+Clause:EXISTENTIAL (V: were@22, S: scarves@24, A?: inside@18)
+Clause:SVO (V: did@35, S: pieces@31, CCOMP: have@37)
+Clause:SVO (V: have@37, S: Chloe@36, O: total@38)
+Proposition:	"Chloe"	"be unbox"	"some of she old winter clothes"
+Proposition:	"she"	"has"	"old winter clothes"
+Proposition:	"she"	"find"	"how many piece of winter clothing do Chloe have total"
+Proposition:	"2 scarf and 6 mitten"	"there be"
+Proposition:	"piece of winter clothing"	"do"	"Chloe have total"
+Proposition:	"Chloe"	"have"	"total"
+Sentence:April's discount flowers was having a sale where each flower was 3 dollars. If Emily bought 2 roses and 2 daisies, how much did she spend?
+Clause:SVO (S: April@1, V: "has", O: flowers@4)
+Clause:SVO (V: having@6, S: flowers@4, O: sale@8, A?: dollars@14)
+Clause:SVC (C: dollars@14, V: was@12, S: flower@11, A?: where@9)
+Clause:SVO (V: bought@18, S: Emily@17, O: roses@20)
+Clause:SV (V: spend@29, S: she@28)
+Proposition:	"April"	"has"	"discount flower"
+Proposition:	"April 's discount flower"	"be have"	"a sale"
+Proposition:	"each flower"	"be"	"3 dollar"
+Proposition:	"Emily"	"buy"	"2 rose and 2 daisy"
+Proposition:	"she"	"spend"
+Sentence:Isabel had 2 pages of math homework and 4 pages of reading homework. If each page had 5 problems on it, how many problems did she have to complete total?
+Clause:SVO (V: had@2, S: Isabel@1, O: pages@4)
+Clause:SVO (V: had@18, S: page@17, A?: homework@13, O: problems@20)
+Clause:SVO (V: did@27, S: problems@26, CCOMP: have@29)
+Clause:SVO (V: have@29, S: she@28, XCOMP: complete@31)
+Proposition:	"Isabel"	"have"	"2 page of math homework and 4 page of read homework if each page have 5 problem on it how many problem do she have to complete total"
+Proposition:	"each page"	"have"	"5 problem on it"
+Proposition:	"problem"	"do"	"she have to complete total"
+Proposition:	"she"	"have"	"to complete total"
+Sentence:Wendy was playing a video game where she scores 5 points for each treasure she finds. If she found 4 treasures on the first level and 3 on the second, what would her score be?
+Clause:SVO (V: scores@9, S: she@8, A?: where@7, O: points@11, A?: for@12)
+Clause:SVO (V: finds@16, S: she@15, O: treasure@14)
+Clause:SVO (V: found@20, S: she@19, O: treasures@22, A?: on@23, A?: on@29)
+Clause:SV (V: score@36, S: her@35)
+Proposition:	"she"	"score"	"5 point"
+Proposition:	"she"	"find"	"each treasure"
+Proposition:	"she"	"find"	"4 treasure"
+Proposition:	"she"	"would score"
+Sentence:There were 7 friends playing a video game online when 2 more players joined the game. If each player had 7 lives, how many lives did they have total?
+Clause:EXISTENTIAL (V: were@2, S: friends@4)
+Clause:SVO (V: joined@14, S: players@13, A?: when@10, O: game@16)
+Clause:SVO (V: had@21, S: player@20, O: lives@23)
+Clause:SVO (V: did@28, S: lives@27, CCOMP: have@30)
+Clause:SVO (V: have@30, S: they@29, O: total@31)
+Proposition:	"7 friend play a video game online when 2 more player join the game if each player have 7 life"	"there be"
+Proposition:	"2 more player"	"join"	"the game"
+Proposition:	"each player"	"have"	"7 life"
+Proposition:	"how many life"	"do"	"they have total"
+Proposition:	"they"	"have"	"total"
+Sentence:Paul bought 6 boxes of chocolate candy and 4 boxes of caramel candy. If each box has 9 pieces inside it, how much candy did he have total?
+Clause:SVO (V: bought@2, S: Paul@1, O: boxes@4, A?: has@18)
+Clause:SVO (V: has@18, S: box@17, O: pieces@20)
+Clause:SVO (V: did@27, S: candy@26, CCOMP: have@29)
+Clause:SVO (V: have@29, S: he@28, O: total@30)
+Proposition:	"Paul"	"buy"	"6 box of chocolate candy and 4 box of caramel candy"
+Proposition:	"each box"	"have"	"9 piece inside it"
+Proposition:	"how much candy"	"do"	"he have total"
+Proposition:	"he"	"have"	"total"
+Sentence:A pet store has 6 bird cages. If each cage has 6 parrots and 2 parakeets in it, how many birds does the pet store have total?
+Clause:SVO (V: has@4, S: store@3, O: bird@6)
+Clause:SVO (V: has@12, S: cage@11, O: parrots@14, A?: in@18)
+Clause:SVO (V: does@24, S: birds@23, CCOMP: have@28)
+Clause:SVO (V: have@28, S: store@27, O: total@29)
+Proposition:	"a pet store"	"have"	"6 bird"
+Proposition:	"each cage"	"have"	"6 parrot and 2 parakeet"
+Proposition:	"bird"	"do"	"the pet store have total"
+Proposition:	"the pet store"	"have"	"total"
+Sentence:Rachel was organizing her book case making sure each of the shelves had exactly 9 books on it. If she had 6 shelves of mystery books and 2 shelves of picture books, how many books did she have total?
+Clause:SVOC (V: organizing@3, S: Rachel@1, O: case@6, XCOMP: making@7)
+Clause:SVO (S: her@4, V: "has", O: case@6)
+Clause:SVO (V: had@13, S: each@9, O: books@16)
+Clause:SVO (V: had@22, S: she@21, O: shelves@24)
+Clause:SVO (V: did@38, S: books@37, CCOMP: have@40)
+Clause:SVO (V: have@40, S: she@39, O: total@41)
+Proposition:	"Rachel"	"be organize"	"she book case make sure each of the shelf have exactly 9 book on it if she have 6 shelf of mystery book and 2 shelf of picture book how many book do she have total"
+Proposition:	"she"	"has"	"book case"
+Proposition:	"each of the shelf"	"have"	"exactly 9 book on it"
+Proposition:	"she"	"have"	"6 shelf of mystery book and 2 shelf of picture book"
+Proposition:	"book"	"do"	"she have total"
+Proposition:	"she"	"have"	"total"
+Sentence:At Billy's Restaurant a group with 2 adults and 5 children came in to eat. If each meal cost 3 dollars, how much was the bill?
+Clause:SVO (S: Billy@2, V: "has", O: Restaurant@4)
+Clause:SVA (V: came@13, S: group@6, A?: At@1, A!: in@14)
+Clause:SVO (V: cost@21, S: meal@20, O: dollars@23)
+Proposition:	"Billy"	"has"	"Restaurant"
+Proposition:	"a group with 2 adult and 5 child"	"come"	"in to eat if each meal cost 3 dollar"
+Proposition:	"each meal"	"cost"	"3 dollar"
+Sentence:While playing a trivia game, Adam answered 5 questions correct in the first half and 5 questions correct in the second half. If each question was worth 5 points, what was his final score?
+Clause:SVC (V: answered@8, S: Adam@7, A?: playing@2, ACOMP: correct@11, A?: in@12)
+Clause:SV (V: correct@19, S: questions@18, A?: in@20)
+Clause:SVC (C: worth@29, V: was@28, S: question@27)
+Clause:SV (V: was@34, S: score@37, A?: answered@8)
+Clause:SVO (S: his@35, V: "has", O: score@37)
+Proposition:	"Adam"	"answer"	"5 question correct"
+Proposition:	"5 question"	"correct"
+Proposition:	"each question"	"be"	"worth 5 point"
+Proposition:	"he final score"	"what be"
+Proposition:	"he"	"has"	"final score"
+Sentence:Haley's favorite band was holding a concert where tickets were 4 dollars each. Haley bought 3 tickets for herself and her friends and 5 extra tickets in case anyone else wanted to go. How much did she spend?
+Clause:SVO (S: Haley@1, V: "has", O: band@4)
+Clause:SVO (V: holding@6, S: band@4, O: concert@8)
+Clause:SVC (C: dollars@13, V: were@11, S: tickets@10, A?: where@9)
+Clause:SVO (V: bought@17, S: Haley@16, A?: dollars@13, O: concert@8)
+Clause:SVO (S: her@23, V: "has", O: friends@24)
+Clause:SVO (V: wanted@33, S: friends@24, XCOMP: go@35)
+Clause:SV (V: spend@41, S: she@40)
+Proposition:	"Haley"	"has"	"favorite band"
+Proposition:	"Haley 's favorite band"	"be hold"	"a concert"
+Proposition:	"ticket"	"be"	"4 dollar each"
+Proposition:	"Haley"	"buy"	"a concert"
+Proposition:	"she"	"has"	"friend and 5 extra ticket in case anyone else"
+Proposition:	"she friend and 5 extra ticket in case anyone else"	"want"	"to go"
+Proposition:	"she"	"do spend"
+Sentence:Luke was putting his spare change into piles. He had 5 piles of quarters and 5 piles of dimes. If each pile had 3 coins in it, how many coins did he have total?
+Clause:SVOA (V: putting@3, S: Luke@1, O: change@6, A!: into@7)
+Clause:SVO (S: his@4, V: "has", O: change@6)
+Clause:SVO (V: had@11, S: He@10, O: piles@13)
+Clause:SVO (V: had@25, S: pile@24, O: coins@27)
+Clause:SVO (V: did@34, S: coins@33, CCOMP: have@36)
+Clause:SVO (V: have@36, S: he@35, O: total@37)
+Proposition:	"Luke"	"be put"	"he spare change into pile"
+Proposition:	"he"	"has"	"spare change"
+Proposition:	"he"	"have"	"5 pile of quarter and 5 pile of dimes if each pile have 3 coin in it how many coin do he have total"
+Proposition:	"each pile"	"have"	"3 coin in it"
+Proposition:	"coin"	"do"	"he have total"
+Proposition:	"he"	"have"	"total"
+Sentence:Victor and his friend were buying trick decks from the magic shop for 8 dollars each. How much did they spend if Victor bought 6 decks and his friend bought 2 decks?
+Clause:SVO (S: his@3, V: "has", O: friend@4)
+Clause:SV (V: buying@6, S: Victor@1)
+Clause:SV (V: spend@22, S: they@21, A?: bought@25)
+Clause:SVO (V: bought@25, S: Victor@24, CCOMP: bought@31)
+Clause:SVO (S: his@29, V: "has", O: friend@30)
+Clause:SVO (V: bought@31, S: decks@27, O: decks@33)
+Proposition:	"he"	"has"	"friend"
+Proposition:	"Victor and he friend"	"be buy"
+Proposition:	"they"	"do spend"
+Proposition:	"Victor"	"buy"	"6 deck and he friend buy 2 deck"
+Proposition:	"he"	"has"	"friend"
+Proposition:	"6 deck and he friend"	"buy"	"2 deck"
+Sentence:Wendy bought 4 new chairs and 4 new tables for her house. If she spent 6 minutes on each piece furniture putting it together, how many minutes did it take her to finish?
+Clause:SVO (V: bought@2, S: Wendy@1, O: chairs@5)
+Clause:SVO (S: her@11, V: "has", O: house@12)
+Clause:SVO (V: spent@16, S: she@15, O: minutes@18, A?: on@19)
+Clause:SVO (V: take@32, S: it@31, XCOMP: finish@35)
+Clause:SV (V: finish@35, S: her@33)
+Proposition:	"wendy"	"buy"	"4 new chair and 4 new table"
+Proposition:	"she"	"has"	"house"
+Proposition:	"she"	"spend"	"6 minute"
+Proposition:	"it"	"do take"	"she to finish"
+Proposition:	"she"	"to finish"
+Sentence:George was working as a sacker at a grocery store where he made 5 dollars an hour. On Monday he worked 7 hours and on Tuesday he worked 2 hours. How much money did George make in those two days?
+Clause:SVC (C: working@3, V: was@2, S: George@1, A?: as@4)
+Clause:SVOO (V: made@13, S: he@12, A?: where@11, O: dollars@15, IO: store@10)
+Clause:SVOO (V: worked@22, S: he@21, O: hours@24, IO: Monday@20)
+Clause:SVO (V: worked@29, S: he@28, A?: on@26, O: hours@31)
+Clause:SVO (V: make@38, S: George@37, O: money@35, A?: in@39)
+Proposition:	"George"	"be"	"work how much money do George make in those two day"
+Proposition:	"he"	"make"	"5 dollar a hour on Monday a grocery store"
+Proposition:	"he"	"work"	"7 hour Monday"
+Proposition:	"he"	"work"	"2 hour"
+Proposition:	"George"	"do make"	"how much money"
+Sentence:While shopping for music online, Megan bought 2 country albums and 8 pop albums. Each album came with a lyric sheet and had 7 songs. How many songs did Megan buy total?
+Clause:SVC (S: online@5, V: "is", C: Megan@7)
+Clause:SVO (V: bought@8, S: shopping@2, O: albums@11)
+Clause:SVO (V: came@19, S: album@18, A?: with@20, O: albums@11)
+Clause:SVOO (V: had@25, S: album@18, O: songs@27, IO: albums@11)
+Clause:SVO (V: did@32, S: songs@31, CCOMP: buy@34)
+Clause:SVO (V: buy@34, S: Megan@33, O: total@35)
+Proposition:	"music online"	"is"	"Megan"
+Proposition:	"shopping for music online"	"buy"	"2 country album and 8 pop album"
+Proposition:	"each album"	"come"	"2 country album and 8 pop album"
+Proposition:	"each album"	"have"	"7 song 2 country album and 8 pop album"
+Proposition:	"how many song"	"do"	"Megan buy total"
+Proposition:	"Megan"	"buy"	"total"
+Sentence:A waiter had 6 tables he was waiting on, with 3 women and 5 men at each table. How many customers total did the waiter have?
+Clause:SV (V: had@3, S: waiter@2)
+Clause:SVO (V: waiting@8, S: he@6, O: tables@5)
+Clause:SVO (V: have@28, S: waiter@27, O: customers@23)
+Proposition:	"a waiter"	"have"
+Proposition:	"he"	"be wait on"	"6 table how many customer total do the waiter have"
+Proposition:	"the waiter"	"do have"	"how many customer total"
+Sentence:Robin uploaded 35 pictures from her phone and 5 from her camera to facebook. If she sorted the pics into 5 different albums with the same amount of pics in each album, how many pictures were in each of the albums?
+Clause:SVO (V: uploaded@2, S: Robin@1, O: pictures@4, A?: from@5, A?: from@10, A?: to@13)
+Clause:SVO (S: her@6, V: "has", O: phone@7)
+Clause:SVO (S: her@11, V: "has", O: camera@12)
+Clause:SVO (V: sorted@18, S: she@17, O: pics@20, A?: into@21, A?: with@25)
+Clause:SVA (V: were@38, S: pictures@37, A!: in@39)
+Proposition:	"Robin"	"upload"	"35 picture"
+Proposition:	"she"	"has"	"phone and 5"
+Proposition:	"she"	"has"	"camera"
+Proposition:	"she"	"sort"	"the pic"
+Proposition:	"picture"	"be"	"in each of the album"
+Sentence:Olivia was making baggies of cookies with 9 cookies in each bag. If she had 13 chocolate chip cookies and 41 oatmeal cookies, how many baggies could she make?
+Clause:SVOC (V: making@3, S: Olivia@1, O: baggies@4, CCOMP: make@31)
+Clause:SVO (V: had@16, S: she@15, O: cookies@20)
+Clause:SV (V: could@29, S: baggies@28)
+Clause:SV (V: make@31, S: she@30, A?: had@16)
+Proposition:	"Olivia"	"be make"	"baggy of cookie with 9 cookie in each bag if she have 13 chocolate chip cookie and 41 oatmeal cookie how many baggy could she make"
+Proposition:	"she"	"have"	"13 chocolate chip cookie and 41 oatmeal cookie"
+Proposition:	"baggy"	"could"
+Proposition:	"she"	"make"
+Sentence:Luke made 9 dollars mowing lawns and 18 dollars weed eating. If he only spent 3 dollar a week, how long would the money last him?
+Clause:SVO (V: made@2, S: Luke@1, O: lawns@6)
+Clause:SVO (V: spent@16, S: he@14, A?: eating@11, A?: only@15, O: dollar@18, A?: week@20)
+Clause:SVOO (V: last@27, S: money@26, A?: long@23, O: him@28, IO: lawns@6)
+Proposition:	"Luke"	"make"	"9 dollar mowing lawn and 18 dollar weed eating if he only spend 3 dollar a week"
+Proposition:	"he"	"spend"	"3 dollar"
+Proposition:	"the money"	"would last"	"he 9 dollar mowing lawn and 18 dollar weed eating if he only spend 3 dollar a week"
+Sentence:There school's baseball team had 48 new players and 6 returning players. If the coach put them into groups with 6 players in each group, how many groups would there be?
+Clause:SVO (S: school@2, V: "has", O: team@5)
+Clause:SVO (V: had@6, S: team@5, A?: There@1, O: players@9)
+Clause:SVOA (V: put@18, S: coach@17, O: them@19, A!: into@20, A?: with@22)
+Clause:SV (V: be@34, S: groups@31, A?: there@33)
+Proposition:	"school"	"has"	"baseball team"
+Proposition:	"school 's baseball team"	"have"	"48 new player and 6 returning player if the coach put they into group with 6 player in each group how many group would there be"
+Proposition:	"the coach"	"put"	"they into group"
+Proposition:	"group"	"would be"
+Sentence:For a birthday party Jerry bought 41 regular sodas and 22 diet sodas. If his fridge would only hold 9 on each shelf, how many shelves would he fill up?
+Clause:SVO (V: bought@6, S: Jerry@5, O: sodas@9)
+Clause:SVO (S: his@16, V: "has", O: fridge@17)
+Clause:SVO (V: hold@20, S: fridge@17, A?: only@19, O: 9@21, A?: on@22)
+Clause:SV (V: fill@31, S: he@30, A?: bought@6)
+Proposition:	"a birthday party Jerry"	"buy"	"41 regular soda and 22 diet soda if he fridge would only hold 9 on each shelf"
+Proposition:	"he"	"has"	"fridge"
+Proposition:	"he fridge"	"would hold"	"9"
+Proposition:	"he"	"would fill up"
+Sentence:For every 4 pounds they recycled they earned one point. If Paige recycled 14 pounds and her friends recycled 2 pounds, how many points did they earn?
+Clause:SVO (V: recycled@6, S: they@5, O: they@7)
+Clause:SV (V: earned@8, S: point@10)
+Clause:SVO (V: recycled@14, S: Paige@13, O: pounds@16)
+Clause:SVO (S: her@18, V: "has", O: friends@19)
+Clause:SVO (V: recycled@20, S: pounds@4, O: pounds@22)
+Clause:SVO (V: earn@29, S: they@28, A?: recycled@20, O: points@26)
+Proposition:	"they"	"recycle"	"they"
+Proposition:	"one point"	"earn"
+Proposition:	"Paige"	"recycle"	"14 pound and she friend"
+Proposition:	"she"	"has"	"friend"
+Proposition:	"every 4 pound they recycle they earn one point if Paige recycle 14 pound and she friend"	"recycle"	"2 pound"
+Proposition:	"they"	"do earn"	"how many point"
+Sentence:For homework Nancy had 17 math problems and 15 spelling problems. If she can finish 8 problems in an hour how long will it take her to finish all the problems?
+Clause:SVO (V: had@4, S: Nancy@3, A?: For@1, O: problems@7)
+Clause:SVO (V: finish@16, S: she@14, O: problems@18, A?: in@19)
+Clause:SVOC (V: take@26, S: it@25, A?: finish@16, XCOMP: finish@29, O: problems@7)
+Clause:SVO (V: finish@29, S: her@27, O: problems@32)
+Proposition:	"Nancy"	"have"	"17 math problem and 15 spelling problem"
+Proposition:	"she"	"can finish"	"8 problem"
+Proposition:	"it"	"take"	"she to finish all the problem 17 math problem and 15 spelling problem"
+Proposition:	"she"	"to finish"	"all the problem"
+Sentence:The schools debate team had 11 boys and 45 girls on it. If they were split into groups of 7 how many groups could they make?
+Clause:SVOC (V: had@5, S: team@4, O: boys@7, A?: on@11, CCOMP: make@27)
+Clause:SVO (V: split@17, S: they@15, A?: into@18, CCOMP: could@25)
+Clause:SV (V: could@25, S: groups@24)
+Clause:SV (V: make@27, S: they@26, A?: split@17)
+Proposition:	"the school debate team"	"have"	"11 boy and 45 girl if they be split into group of 7 how many group could they make"
+Proposition:	"they"	"be split"	"how many group could"
+Proposition:	"group"	"could"
+Proposition:	"they"	"make"

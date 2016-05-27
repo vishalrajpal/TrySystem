@@ -19,7 +19,10 @@
             </plugin>
         </plugins>
     </build>
-
+    <properties>
+        <nd4j.version>0.4-rc3.8</nd4j.version>
+        <dl4j.version>0.4-rc3.8</dl4j.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
@@ -45,6 +48,26 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.21</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160212</version>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-ui</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-nlp</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tw.edu.ntu.csie</groupId>
+            <artifactId>libsvm</artifactId>
+            <version>3.21</version>
+            <systemPath>/Users/Rajpals/Drives/Study/Research/LibSVM/libsvm-3.21/java/libsvm.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

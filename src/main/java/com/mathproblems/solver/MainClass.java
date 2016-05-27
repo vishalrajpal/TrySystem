@@ -1,5 +1,6 @@
 package com.mathproblems.solver;
 
+import com.mathproblems.solver.classifier.SVMClassifier;
 import com.mathproblems.solver.facttuple.Question;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;
@@ -16,6 +17,7 @@ import java.util.*;
 import com.mathproblems.solver.partsofspeech.Adjective;
 import com.mathproblems.solver.partsofspeech.Noun;
 import com.mathproblems.solver.partsofspeech.Verb;
+
 import srl.mateplus.SRL;
 
 public class MainClass {
@@ -134,7 +136,7 @@ public class MainClass {
                     tupleSentence.addAllNouns(nounList);
                     tupleSentence.addAllAdjectives(adjectiveList);
                     tupleSentence.addAllVerbs(verbList);
-                    runClausie(tupleSentence);
+                    //runClausie(tupleSentence);
                     //List<Verb> verbList = sParser.parseVerbsAccordingToUniversalDependencyTags(tdl);
                     //System.out.println(verbList);
                 }
@@ -154,9 +156,9 @@ public class MainClass {
         StringBuffer output = new StringBuffer();
 
         String shellPath = Thread.currentThread().getContextClassLoader().getResource("clausie").getPath();
-        //String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/sentences-test.txt").getPath();
+        String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/training_data_full_questions.txt").getPath();
         //String outputPath = shellPath + "/output_new.txt";
-        String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/single_sentence.txt").getPath();
+        //String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/single_sentence.txt").getPath();
         String outputPath = shellPath + "/clausie_output.txt";
         String command = shellPath + "/./clausie.sh -vlf " + trainingDataPath + " -o " + outputPath;
         Process p;
@@ -182,12 +184,24 @@ public class MainClass {
 
         System.out.println(output.toString());
 
-        sentence.parseClausieOutput(outputPath);
+        //sentence.parseClausieOutput(outputPath);
     }
 
     public static void main(String[] args) {
+        /**To produce wordnet and word2vec vectors for training verbs*/
+        //SVMClassifier.writeTrainingDataToFile("src/main/resources/verbs_testing.txt");
+
+        /** LibSVM training and evaluation*/
+       /* SVMClassifier svmClassifier = new SVMClassifier();
+        svmClassifier.libSvmTrain("src/main/resources/verbs_training_output.txt");
+        svmClassifier.libSvmEvaluate("src/main/resources/verbs_testing_output.txt");*/
+
+        /** Run ClausIE */
+        //MainClass.runClausie(null);
+
+        /** Perform our own POS tagging.*/
        MainClass.initializeComponents();
        MainClass.performPOSTagging();
-        //MainClass.runClausie(null);
+
     }
 }
