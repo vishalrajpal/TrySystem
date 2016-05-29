@@ -6,7 +6,7 @@ import java.util.Set;
 public class Question {
 
     private final String question;
-    private final Set<Sentence> allSentences;
+    private final LinkedHashSet<Sentence> allSentences;
     private final Set<Sentence> dataSentences;
     private Sentence questionSentence = null;
     public Question(final String question) {
@@ -36,5 +36,13 @@ public class Question {
             questionToString.append("'\t'" + sentence + "'\n'");
         }
         return questionToString.toString();
+    }
+
+    public LinkedHashSet<Sentence> getAllSentences() {
+        return allSentences;
+    }
+
+    public String getQuestion() {
+        return question;
     }
 }

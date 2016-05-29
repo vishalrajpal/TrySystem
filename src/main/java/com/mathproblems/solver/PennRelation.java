@@ -30,17 +30,26 @@ public enum PennRelation {
 	root,
 	nsubj,
 	conj,
+	conjand,
 	nsubjpass,
 	parataxis,
 	ccomp,
 	advcl;
 	
 	public static PennRelation valueOfPennRelation(String str) {
-		str = str.split(":")[0];
+		//str = str.split(":")[0];
+		String[] splitStr = str.split(":");
+		str = splitStr[0];
 		switch(str) {
-		case "case":
-			str = "penncase";
-			break;
+			case "case":
+				str = "penncase";
+				break;
+			case "conj":
+				if(splitStr.length > 1) {
+					if(splitStr[1].equals("and")) {
+						str = "conjand";
+					}
+				}
 		}
 		return PennRelation.valueOf(str);		
 	}

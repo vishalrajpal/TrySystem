@@ -2,12 +2,13 @@ package com.mathproblems.solver;
 
 import java.util.*;
 
+import com.mathproblems.solver.equationtool.Triplet;
 import com.mathproblems.solver.facttuple.Question;
-import edu.stanford.nlp.trees.TypedDependency;
 
 import com.mathproblems.solver.partsofspeech.Adjective;
 import com.mathproblems.solver.partsofspeech.Noun;
 import com.mathproblems.solver.partsofspeech.Verb;
+import edu.stanford.nlp.trees.TypedDependency;
 import se.lth.cs.srl.CompletePipeline;
 import se.lth.cs.srl.corpus.Predicate;
 import se.lth.cs.srl.corpus.Sentence;
@@ -57,7 +58,7 @@ public class SmartParser {
 	
 	public Collection<Noun> parseNounsAccordingToUniversalDependencyTags(List<TypedDependency> dependencies) {
 		String currentRelation;
-		List<Noun> nounList = new ArrayList<>();
+		Set<Noun> nounList = new LinkedHashSet<>();
         Set<Integer> dependentIndices = new HashSet<>();
 		for(TypedDependency dependency : dependencies) {
 			currentRelation = dependency.reln().getShortName();
@@ -72,6 +73,16 @@ public class SmartParser {
 			}
 		}
 		return nounList;
+	}
+
+	public Collection<TypedDependency> parserNounsWithConjAnds(List<TypedDependency> dependencies) {
+		Collection<TypedDependency> conjAndDependencies = new LinkedHashSet<>();
+		for(TypedDependency dependency : dependencies) {
+			if (PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.conjand)) {
+				conjAndDependencies.add(dependency);
+			}
+		}
+		return conjAndDependencies;
 	}
 	
 	public List<Adjective> parseAdjectivesAccordingToUniversalDependencyTags(List<TypedDependency> dependencies, Collection<Noun> nounList) {
@@ -159,6 +170,66 @@ public class SmartParser {
         }
         return verbs;
     }
+
+	public LinkedHashSet<Triplet> getTripletsFromSRL(SRL srl, String sentence) {
+		final LinkedHashSet<Triplet> triplets = new LinkedHashSet<>();
+		try {
+			CompletePipeline pipeline = srl.getPipeline();
+			String[] tokens = pipeline.pp.tokenize(sentence); // this is how you tokenize your text
+			Sentence s = pipeline.parse(Arrays.asList(tokens)); // this is how you then process the text (tokens)
+
+			String subject, subjectTag, verb, verbTag, object, objectTag;
+			int subjectIndex, verbIndex, objectIndex;
+			// some words in a sentence are recognized as predicates
+			for (Predicate p : s.getPredicates()) {
+				if (p.getPOS().startsWith("VB")) {
+					subject = subjectTag = object = objectTag = null;
+					subjectIndex = objectIndex = 0;
+					verb = p.getLemma();
+					verbTag = p.getPOS();
+					verbIndex = p.getIdx();
+					for (Word arg : p.getArgMap().keySet()) {
+						if (arg.getDeprel().equals("SBJ")) {
+							subject = arg.getForm();
+							subjectTag = p.getArgumentTag(arg);
+							subjectIndex = arg.getIdx();
+						} else if (arg.getDeprel().equals("OBJ")) {
+							object = arg.getForm();
+							objectTag = p.getArgumentTag(arg);
+							objectIndex = arg.getIdx();
+						}
+					}
+					final Triplet triplet = new Triplet(subject, subjectTag, subjectIndex, verb, verbTag, verbIndex, object, objectTag, objectIndex);
+					triplets.add(triplet);
+				}
+			}
+			System.out.println(triplets);
+		} catch (final Exception e) {
+			System.err.println("Error running srl to get triplets.");
+		}
+		return triplets;
+	}
+
+	public LinkedHashMap<String, String> getNounWithTags(SRL srl, String sentence) {
+		final LinkedHashMap<String, String> nounWithTags = new LinkedHashMap<>();
+		try {
+			CompletePipeline pipeline = srl.getPipeline();
+			String[] tokens = pipeline.pp.tokenize(sentence);
+			Sentence s = pipeline.parse(Arrays.asList(tokens));
+
+			for (Predicate p : s.getPredicates()) {
+				for(Map.Entry<Word, String> entry: p.getArgMap().entrySet()) {
+					Word w = entry.getKey();
+					String tag = entry.getValue();
+					nounWithTags.put(w.getForm(), tag);
+				}
+			}
+			System.out.println(nounWithTags);
+		} catch (final Exception e) {
+			System.err.println("Error running srl to get noun with tags.");
+		}
+		return nounWithTags;
+	}
 
 	public void mergeCompoundsOfParsedNouns(Collection<Noun> nounList) {
         Set<Noun> toRemove = new HashSet<>();

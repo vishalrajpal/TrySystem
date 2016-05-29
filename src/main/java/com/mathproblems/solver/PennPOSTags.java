@@ -3,6 +3,7 @@ package com.mathproblems.solver;
 public enum PennPOSTags {
 	PRP,
 	PRP$,
+	IN,
 	CD,
 	VBD,
 	VBN,

@@ -52,7 +52,7 @@ public class Noun implements PartsOfSpeech {
 	@Override
 	public String toString() {
 		return "Noun [dependency=" + dependency + ", word=" + dependent
-				+ ", nounType=" + nounType + ", index=" + dependentIndex + "]";
+				+ ", nounType=" + nounType + ", index=" + dependentIndex + ", quantity=" + quantity + "]";
 	}
 	
 	public String toSmartString() {
@@ -76,7 +76,7 @@ public class Noun implements PartsOfSpeech {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Noun noun = (Noun) o;
-		return getDependent().equals(noun.getDependent());
+		return getDependent().equals(noun.getDependent()) && getDependentIndex() == noun.getDependentIndex();
 	}
 
 	@Override

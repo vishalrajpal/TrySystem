@@ -1,9 +1,11 @@
 package com.mathproblems.solver;
 
 import com.mathproblems.solver.classifier.SVMClassifier;
+import com.mathproblems.solver.equationtool.Triplet;
 import com.mathproblems.solver.facttuple.Question;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;
+import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.process.DocumentPreprocessor;
@@ -27,6 +29,7 @@ public class MainClass {
     private static LexicalizedParser lp;
     private static TokenizerFactory tokenizerFactory;
     private static SRL srl;
+    private static SmartParser sParser;
 
     public static void initializeComponents() {
         tlp = new PennTreebankLanguagePack();
@@ -54,9 +57,164 @@ public class MainClass {
                 "-reranker"				// turn on reranking (part of SRL)
         };
         srl = new SRL(pipelineOptions);
+        sParser = new SmartParser();
     }
 
     public static void performPOSTagging() {
+        try {
+
+            String text;
+            List wordList;
+            Tree tree;
+            GrammaticalStructure gs;
+            List<TypedDependency> tdl;
+
+            File trainingFile = new File(MainClass.class.getClassLoader().getResource("test.txt").getPath());
+            Scanner scanner = new Scanner(trainingFile);
+            //int questionCount = 0;
+
+/*            int sentenceCount;
+            Reader questionReader;
+            DocumentPreprocessor sentenceSplitter;
+            Iterator<List<HasWord>> sentences;
+            String currentSentence;*/
+
+            Collection<Question> tupleQuestions = new HashSet<>();
+           // Collection<com.mathproblems.solver.facttuple.Sentence> tupleSentences = new HashSet<>();
+
+            while (scanner.hasNextLine()) {
+                text = scanner.nextLine();
+                System.out.println();
+                Question tupleQuestion = new Question(text);
+
+                //System.out.println("Question: " + ++questionCount);
+                //sentenceCount = 0;
+                //questionReader = new StringReader(text);
+                //sentenceSplitter = new DocumentPreprocessor(questionReader);
+                //sentences = sentenceSplitter.iterator();
+                //currentSentence = Sentence.listToString(sentences.next());
+                //com.mathproblems.solver.facttuple.Sentence tupleSentence = new com.mathproblems.solver.facttuple.Sentence(currentSentence, tupleQuestion);
+                //tupleQuestion.addSentence(tupleSentence);
+                //System.out.println("Sentence: " + ++sentenceCount + " " + currentSentence);
+
+                wordList = tokenizerFactory.getTokenizer(new StringReader(text)).tokenize();
+                tree = lp.apply(wordList);
+                gs = gsf.newGrammaticalStructure(tree);
+                tdl = gs.typedDependenciesCCprocessed();
+                System.out.println(tdl);
+
+                System.out.println("------Parsing Nouns------");
+                Collection<Noun> nounList = sParser.parseNounsAccordingToUniversalDependencyTags(tdl);
+                //sParser.printProcessedNouns(nounList);
+
+                System.out.println("------Merging Compounds to Nouns------");
+                sParser.mergeCompoundsOfParsedNouns(nounList);
+                // sParser.printProcessedNouns(nounList);
+
+                System.out.println("------Parsing Adjectives------");
+                List<Adjective> adjectiveList = sParser.parseAdjectivesAccordingToUniversalDependencyTags(tdl, nounList);
+                //sParser.printProcessedNouns(nounList);
+
+                System.out.println("------Getting All Nummods------");
+                List<TypedDependency> numMods = sParser.getAllNummods(tdl);
+
+                System.out.println("------Merging Nummods with Nouns------");
+                sParser.mergeNummodsWithParsedNouns(numMods, nounList);
+
+                System.out.println("------Printing Nouns------");
+                sParser.printProcessedNouns(nounList);
+
+                sParser.removeDuplicateNouns(nounList);
+                System.out.println("------Parsing Verbs------");
+
+                //tupleSentence.addAllNouns(nounList);
+                //tupleSentence.addAllAdjectives(adjectiveList);
+
+
+
+                tupleQuestions.add(tupleQuestion);
+                linkSRLAndPOS(tupleQuestion, nounList, tdl);
+            }
+
+           // sParser.printProcessedQuestions(tupleQuestions);
+
+        } catch (final Exception e) {
+           e.printStackTrace();
+        }
+    }
+
+    public static void linkSRLAndPOS(Question question, Collection<Noun> nouns, List<TypedDependency> tdl) {
+        final String questionText = question.getQuestion();
+        LinkedHashSet<Triplet> triplets = sParser.getTripletsFromSRL(srl, questionText);
+        System.out.println(triplets);
+
+        Collection<TypedDependency> conjAndDependencies = sParser.parserNounsWithConjAnds(tdl);
+
+        List<Triplet> conjAndTriplets = new ArrayList<>();
+        for(TypedDependency dependency: conjAndDependencies) {
+            Triplet newTriplet;
+            for(Triplet triplet: triplets) {
+                if(triplet.getSubject().equals(dependency.gov().originalText()) && triplet.getSubjectIndex() == dependency.gov().index()) {
+                    newTriplet = new Triplet(dependency.dep().originalText(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
+                            triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
+                            triplet.getObject(), triplet.getObjectTag(), triplet.getObjectIndex());
+                    conjAndTriplets.add(newTriplet);
+                    break;
+                } else if(triplet.getObject().equals(dependency.gov().originalText()) && triplet.getObjectIndex() == dependency.gov().index()) {
+                    newTriplet = new Triplet(triplet.getSubject(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
+                            triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
+                            dependency.dep().originalText(), triplet.getObjectTag(), dependency.dep().index());
+                    conjAndTriplets.add(newTriplet);
+                    break;
+                }
+            }
+        }
+        triplets.addAll(conjAndTriplets);
+        //LinkedHashSet<com.mathproblems.solver.facttuple.Sentence> allSentences = question.getAllSentences();
+        LinkedHashMap<Noun, Triplet> nounToTripletMap = new LinkedHashMap<>();
+        for(Noun sentenceNoun: nouns) {
+            for(Triplet triplet: triplets) {
+                if(triplet.isEqiuvalentToPOSNoun(sentenceNoun)) {
+                    nounToTripletMap.put(sentenceNoun, triplet);
+                    System.out.println("Possible link found.");
+                    System.out.println("Sentence:" + sentenceNoun);
+                    System.out.println("Triplet:" + triplet);
+                }
+            }
+        }
+
+
+
+
+        for(Map.Entry<Noun, Triplet> entry: nounToTripletMap.entrySet()) {
+            Noun n = entry.getKey();
+            Triplet t = entry.getValue();
+            if(n.getQuantity() != 0) {
+                if(t.matchesToSubject(n)) {
+                    System.out.println(n.getQuantity() + t.getSubjectTag() + " " + t.getVerb() + " " + t.getObjectTag());
+                } else if(t.matchesToObject(n)) {
+                    System.out.println(t.getSubjectTag() + " " + t.getVerb() + " " + n.getQuantity() + t.getObjectTag());
+                }
+            } else if (isNumber(t.getSubject()) && t.matchesToSubject(n)) {
+                System.out.println(t.getSubject() + t.getSubjectTag() + " " + t.getVerb() + " " + t.getObjectTag());
+            } else if(isNumber(t.getObject()) && t.matchesToObject(n)) {
+                System.out.println(t.getSubjectTag() + " " + t.getVerb() + " " + t.getObject() + t.getObjectTag());
+            }
+        }
+
+        //sParser.getNounWithTags(srl, questionText);
+
+    }
+
+    private static boolean isNumber(String str) {
+        try {
+            Integer.parseInt(str);
+        } catch (final Exception e) {
+            return false;
+        }
+        return true;
+    }
+    public static void performPOSTagging_old() {
         try {
 
             String text;
@@ -156,9 +314,9 @@ public class MainClass {
         StringBuffer output = new StringBuffer();
 
         String shellPath = Thread.currentThread().getContextClassLoader().getResource("clausie").getPath();
-        String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/training_data_full_questions.txt").getPath();
+        //String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/training_data_full_questions.txt").getPath();
         //String outputPath = shellPath + "/output_new.txt";
-        //String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/single_sentence.txt").getPath();
+        String trainingDataPath = Thread.currentThread().getContextClassLoader().getResource("clausie/single_sentence.txt").getPath();
         String outputPath = shellPath + "/clausie_output.txt";
         String command = shellPath + "/./clausie.sh -vlf " + trainingDataPath + " -o " + outputPath;
         Process p;

@@ -13,7 +13,8 @@ public class PennPOSTagsLists {
 		PENN_NOUN_TAGS.add(PennPOSTags.NNS);
 		PENN_NOUN_TAGS.add(PennPOSTags.NNP);
 		PENN_NOUN_TAGS.add(PennPOSTags.NNPS);
-		
+		PENN_NOUN_TAGS.add(PennPOSTags.CD);
+
 		PENN_ADJECTIVE_TAGS.add(PennPOSTags.JJ);
 		
 		PENN_VERB_TAGS.add(PennPOSTags.VBD);
