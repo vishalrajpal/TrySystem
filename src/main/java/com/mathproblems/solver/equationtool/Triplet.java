@@ -14,6 +14,9 @@ public class Triplet {
     private final String objectTag;
     private final int objectIndex;
 
+    private Integer subjectQuantity;
+    private Integer objectQuantity;
+
     public Triplet(final String subject, final String subjectTag, final int subjectIndex,
                    final String verb, final String verbTag, final int verbIndex,
                    final String object, final String objectTag, final int objectIndex) {
@@ -28,7 +31,7 @@ public class Triplet {
         this.objectIndex = objectIndex;
     }
 
-    public boolean isEqiuvalentToPOSNoun(Noun n) {
+    public boolean isEquivalentToPOSNoun(Noun n) {
         boolean isALink = false;
         if(matchesToSubject(n)) {
             //matchingTag = "SBJ";
@@ -57,6 +60,23 @@ public class Triplet {
         }
         return match;
     }
+
+    public void setSubjectQuantity(int quantity) {
+        subjectQuantity = quantity;
+    }
+
+    public void setObjectQuantity(int quantity) {
+        objectQuantity = quantity;
+    }
+
+    public Integer getSubjectQuantity() {
+        return subjectQuantity;
+    }
+
+    public Integer getObjectQuantity() {
+        return objectQuantity;
+    }
+
     public String getSubject() {
         return subject;
     }

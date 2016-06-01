@@ -16,7 +16,8 @@ public class Noun implements PartsOfSpeech {
 	private final SortedSet<PartsOfSpeech> mergedCompounds;
 	private final String governer;
 	private int quantity;
-
+	private final Map<String, Integer> relatedNouns;
+	final SortedSet<Integer> indices;
 	public Noun (TypedDependency dependency) {
 		this.dependency = dependency;
 		governer = dependency.gov().originalText();
@@ -31,6 +32,10 @@ public class Noun implements PartsOfSpeech {
 			}
 		});
 		mergedCompounds.add(this);
+		relatedNouns = new LinkedHashMap<>();
+		relatedNouns.put(dependent, dependentIndex);
+		indices = new TreeSet<>();
+		indices.add(dependentIndex);
 	}
 	
 	public String getDependent() {
@@ -91,6 +96,7 @@ public class Noun implements PartsOfSpeech {
 			if(n.getRelation().equals(PennRelation.compound) && n.getGoverner().equals(this.getDependent()) && n.getGovernerIndex() == this.getDependentIndex()) {
 				mergedCompounds.add(n);
                 toRemove.add(n);
+				indices.add(n.getDependentIndex());
 			}
 		}
         return toRemove;
@@ -99,6 +105,7 @@ public class Noun implements PartsOfSpeech {
 
 	public void mergeAdjective(PartsOfSpeech adjective) {
 		mergedCompounds.add(adjective);
+		indices.add(adjective.getDependentIndex());
 	}
 	
 	public void associateQuantity(String quantity) {
@@ -108,8 +115,16 @@ public class Noun implements PartsOfSpeech {
 			System.err.println("Error parsing number:" + quantity);
 		}
 	}
-	
+
+	public void associateIndex(String relatedNoun, Integer index) {
+		this.relatedNouns.put(relatedNoun, index);
+	}
+
 	public int getQuantity() {
 		return quantity;
+	}
+
+	public Map<String, Integer> getIndices() {
+		return relatedNouns;
 	}
 }

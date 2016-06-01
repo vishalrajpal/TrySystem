@@ -31,6 +31,7 @@ public class SmartParser {
 	//omitting root
 	public static void initializeUniversalNouns() {
 		universalNounsList.add(PennRelation.nmod);
+		universalNounsList.add(PennRelation.nmodof);
 		universalNounsList.add(PennRelation.dobj);
 		universalNounsList.add(PennRelation.compound);
 		//universalNounsList.add(PennTreeBankRelations.root);
@@ -56,12 +57,12 @@ public class SmartParser {
 		universalVerbsList.add(PennRelation.penncase);
 	}
 	
-	public Collection<Noun> parseNounsAccordingToUniversalDependencyTags(List<TypedDependency> dependencies) {
+	public Collection<Noun> parseNounsAccordingToUniversalDependencyTags(Collection<TypedDependency> dependencies) {
 		String currentRelation;
 		Set<Noun> nounList = new LinkedHashSet<>();
         Set<Integer> dependentIndices = new HashSet<>();
 		for(TypedDependency dependency : dependencies) {
-			currentRelation = dependency.reln().getShortName();
+			currentRelation = dependency.reln().toString();
 			if(universalNounsList.contains(PennRelation.valueOfPennRelation(currentRelation))
                     && PennPOSTagsLists.isANoun(dependency.dep().tag())
                     && !dependentIndices.contains(dependency.dep().index())) {
@@ -75,23 +76,22 @@ public class SmartParser {
 		return nounList;
 	}
 
-	public Collection<TypedDependency> parserNounsWithConjAnds(List<TypedDependency> dependencies) {
+	public Collection<TypedDependency> parserNounsWithConj(Collection<TypedDependency> dependencies) {
 		Collection<TypedDependency> conjAndDependencies = new LinkedHashSet<>();
 		for(TypedDependency dependency : dependencies) {
-			if (PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.conjand)) {
+			if (PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.conj)) {
 				conjAndDependencies.add(dependency);
 			}
 		}
 		return conjAndDependencies;
 	}
 	
-	public List<Adjective> parseAdjectivesAccordingToUniversalDependencyTags(List<TypedDependency> dependencies, Collection<Noun> nounList) {
+	public List<Adjective> mergeAdjectivesOfParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
 		String currentRelation;
 		List<Adjective> adjectiveList = new ArrayList<>();
 		for(TypedDependency dependency : dependencies) {
 			currentRelation = dependency.reln().getShortName();
 			if(universalAdjectiveList.contains(PennRelation.valueOfPennRelation(currentRelation)) && PennPOSTagsLists.isAAdjective(dependency.dep().tag())) {
-				System.out.println(dependency.toString() + " : " + dependency.dep().toString());
 				adjectiveList.add(new Adjective(dependency, nounList));
 			}
 		}
@@ -240,23 +240,11 @@ public class SmartParser {
 			}
 		}
         nounList.removeAll(toRemove);
-	}	
-	
-	public List<TypedDependency> getAllNummods(List<TypedDependency> dependencies) {
-		List<TypedDependency> numMods = new ArrayList<>();
-		String currentRelation;
-		for(TypedDependency dependency: dependencies) {
-			currentRelation = dependency.reln().getShortName();
-			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nummod)) {
-				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
-				numMods.add(dependency);
-			}
-		}
-		return numMods;
 	}
 	
-	public void mergeNummodsWithParsedNouns(List<TypedDependency> numMods, Collection<Noun> nounList) {
+	public void mergeNummodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
 		String dependencyGoverner;
+		List<TypedDependency> numMods = getAllNummods(dependencies);
 		for(TypedDependency dependency: numMods) {
 			dependencyGoverner = dependency.gov().originalText();
 			for(Noun n: nounList) {
@@ -265,6 +253,45 @@ public class SmartParser {
 				}
 			}
 			
+		}
+	}
+
+	private List<TypedDependency> getAllNummods(Collection<TypedDependency> dependencies) {
+		List<TypedDependency> numMods = new ArrayList<>();
+		String currentRelation;
+		for(TypedDependency dependency: dependencies) {
+			currentRelation = dependency.reln().toString();
+			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nummod)) {
+				//System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
+				numMods.add(dependency);
+			}
+		}
+		return numMods;
+	}
+
+	public List<TypedDependency> getAllNmods(Collection<TypedDependency> dependencies) {
+		List<TypedDependency> nMods = new ArrayList<>();
+		String currentRelation;
+		for(TypedDependency dependency: dependencies) {
+			currentRelation = dependency.reln().toString();
+			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nmodof)) {
+				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
+				nMods.add(dependency);
+			}
+		}
+		return nMods;
+	}
+
+	public void mergeNmodsWithParsedNouns(List<TypedDependency> nMods, Collection<Noun> nounList) {
+		String dependent;
+		for(TypedDependency dependency: nMods) {
+			dependent = dependency.dep().originalText();
+			for(Noun n: nounList) {
+				if(dependent.equals(n.getDependent()) && dependency.dep().index() == n.getDependentIndex()) {
+					n.associateQuantity(dependency.gov().originalText());
+					n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
+				}
+			}
 		}
 	}
 

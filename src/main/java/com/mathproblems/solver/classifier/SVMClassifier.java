@@ -95,7 +95,7 @@ public class SVMClassifier {
         word2VecMap.put(CATEGORY_VERB_WEATHER, 1.0);
     }
 
-    public static void writeTrainingDataToFile(final String trainingFilePath) {
+    public static void writeTrainingDataToFile(final String trainingFilePath, boolean writeVerb) {
         try {
             //File format should be +|verb on each line.
             final File inputFile = new File(trainingFilePath);
@@ -112,7 +112,10 @@ public class SVMClassifier {
                 final String line = scanner.nextLine();
                 final String[] data = line.split(";");
                 final String verb = data[1];
-                final StringBuilder outputStringBuilder = new StringBuilder(verb + " ");
+                final StringBuilder outputStringBuilder = new StringBuilder();
+                if(writeVerb) {
+                    outputStringBuilder.append(verb + " ");
+                }
                 if(data[0].equals("+")) {
                     outputStringBuilder.append("+1 ");
                 } else {
@@ -168,9 +171,9 @@ public class SVMClassifier {
         }
 
         svm_parameter param = new svm_parameter();
-        param.gamma = 0.03125;
+        param.gamma = 0.0078125;
         //param.nu = 0.1;
-        param.C = 32768.0;
+        param.C = 262144.0;
 
         param.svm_type = svm_parameter.C_SVC;
         param.kernel_type = svm_parameter.RBF;
@@ -211,13 +214,13 @@ public class SVMClassifier {
                 final String currentLine = scanner.nextLine();
                 final VerbInstance instance = new VerbInstance(currentLine);
                 final double[] features = instance.getFeatures();
-                svm_node[] nodes = new svm_node[features.length];
-                for (int i = 0; i < features.length; i++)
+                svm_node[] nodes = new svm_node[features.length - 1];
+                for (int i = 1; i < features.length; i++)
                 {
                     svm_node node = new svm_node();
                     node.index = i;
                     node.value = features[i];
-                    nodes[i] = node;
+                    nodes[i - 1] = node;
                 }
 
 
@@ -229,6 +232,7 @@ public class SVMClassifier {
                 if(prediction==instance.getLabel()) {
                     noOfCorrectPredictions++;
                 }
+
                 System.out.println(instance.getVerb() + ":" + instance.getLabel() + " Prediction:" + prediction);
             }
             double accuracy = ((double)noOfCorrectPredictions/totalInstances) * 100.0;
@@ -236,6 +240,51 @@ public class SVMClassifier {
         } catch (final Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public double libSVMClassify(final String verb) {
+        double[] features = new double[16];
+        int currentIndex = 0;
+        final LinkedHashMap<String, Double> wordNetData = VerbClassificationFeatures.runWordNet(verb);
+        for(String key: categoriesIndices.keySet()) {
+            double featureValue;
+            if(wordNetData.containsKey(key)) {
+                featureValue = wordNetData.get(key);
+            } else {
+                featureValue = 0.0;
+            }
+            features[currentIndex++] = featureValue;
+        }
+
+        final LinkedHashMap<String, Double> word2VecData = VerbClassificationFeatures.runWord2Vec(verb);
+        for(String key: categoriesIndices.keySet()) {
+            double featureValue;
+            if(word2VecData.containsKey(key)) {
+                featureValue = word2VecData.get(key);
+            } else {
+                featureValue = 0.0;
+            }
+            features[currentIndex++] = featureValue;
+        }
+
+        final VerbInstance verbInstance = new VerbInstance(verb, features);
+        svm_node[] nodes = new svm_node[features.length];
+        for (int i = 0; i < features.length; i++)
+        {
+            svm_node node = new svm_node();
+            node.index = i;
+            node.value = features[i];
+            nodes[i] = node;
+        }
+
+        int totalClasses = 2;
+        int[] labels = new int[totalClasses];
+        svm.svm_get_labels(model,labels);
+
+        double[] prob_estimates = new double[totalClasses];
+        final double prediction = svm.svm_predict_probability(model, nodes, prob_estimates);
+        System.out.println("Classication prediction:" + prediction);
+        return prediction;
     }
 
     public List<VerbInstance> getVerbInstances() {

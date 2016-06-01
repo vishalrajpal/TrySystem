@@ -4,7 +4,7 @@ public enum PennRelation {
 	det,
 	nummod,
 	cc,
-	
+	neg,
 	advmod,
 	mark,
 	dep,	
@@ -26,6 +26,7 @@ public enum PennRelation {
 	compound,
 	//nouns
 	nmod,
+	nmodof,
 	dobj,	
 	root,
 	nsubj,
@@ -48,6 +49,13 @@ public enum PennRelation {
 				if(splitStr.length > 1) {
 					if(splitStr[1].equals("and")) {
 						str = "conjand";
+					}
+				}
+				break;
+			case "nmod":
+				if(splitStr.length > 1) {
+					if(splitStr[1].equals("of")) {
+						str = "nmodof";
 					}
 				}
 		}

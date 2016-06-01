@@ -20,6 +20,18 @@ public class VerbInstance {
 
     }
 
+    public VerbInstance(final String verb, double[] instanceFeatures) {
+
+        label = null;
+        this.verb = verb;
+        this.features = new double[17];
+        features[0] = 0;
+        for(int i = 0; i<16; i++) {
+            features[i+1] = instanceFeatures[i];
+        }
+
+    }
+
     public Double getLabel() {
         if(label.equals("+1")) {
             return 1.0;
