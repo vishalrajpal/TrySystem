@@ -57,9 +57,9 @@ public class SmartParser {
 		universalVerbsList.add(PennRelation.penncase);
 	}
 	
-	public Collection<Noun> parseNounsAccordingToUniversalDependencyTags(Collection<TypedDependency> dependencies) {
+	public LinkedHashSet<Noun> parseNounsAccordingToUniversalDependencyTags(Collection<TypedDependency> dependencies) {
 		String currentRelation;
-		Set<Noun> nounList = new LinkedHashSet<>();
+		LinkedHashSet<Noun> nounList = new LinkedHashSet<>();
         Set<Integer> dependentIndices = new HashSet<>();
 		for(TypedDependency dependency : dependencies) {
 			currentRelation = dependency.reln().toString();

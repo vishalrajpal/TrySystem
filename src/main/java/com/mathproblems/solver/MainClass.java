@@ -3,6 +3,7 @@ package com.mathproblems.solver;
 import com.mathproblems.solver.classifier.SVMClassifier;
 import com.mathproblems.solver.equationtool.Equation;
 import com.mathproblems.solver.equationtool.Triplet;
+import com.mathproblems.solver.facttuple.Question;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.parser.lexparser.LexicalizedParser;
@@ -63,26 +64,32 @@ public class MainClass {
         svmClassifier.libSvmTrain("src/main/resources/verbs_training_output.txt");
     }
 
-    public static void performPOSTagging() {
+    public static LinkedList<Question> performPOSTagging() {
+        final LinkedList<Question> questions = new LinkedList<>();
         try {
             final File trainingFile = new File(MainClass.class.getClassLoader().getResource("test.txt").getPath());
             final Scanner scanner = new Scanner(trainingFile);
             String questionText;
             while (scanner.hasNextLine()) {
+                final LinkedList<com.mathproblems.solver.facttuple.Sentence> sentences = new LinkedList<>();
+                com.mathproblems.solver.facttuple.Sentence lastSentence = null;
                 questionText = scanner.nextLine();
-                System.out.println();
+                final Question newQuestion = new Question(questionText);
                 /** New way to parse */
                 DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(questionText));
                 dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
 
-                for (List<HasWord> sentence : dp) {
-                    final Tree sentenceTree = lp.parseTree(sentence);
+                for (List<HasWord> sentenceWordList : dp) {
+                    final String sentenceText = Sentence.listToString(sentenceWordList);
+                    final com.mathproblems.solver.facttuple.Sentence newSentence = new com.mathproblems.solver.facttuple.Sentence(sentenceText, newQuestion);
+                    lastSentence = newSentence;
+                    final Tree sentenceTree = lp.parseTree(sentenceWordList);
                     final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
 
                     final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
                     System.out.println("------Parsing Nouns------");
-                    final Collection<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies);
+                    final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies);
                     System.out.println("------After Parsing Nouns------");
                     sParser.printProcessedNouns(sentenceNouns);
 
@@ -101,16 +108,27 @@ public class MainClass {
                     System.out.println("------After Merging Nummods------");
                     sParser.printProcessedNouns(sentenceNouns);
 
-                    linkSRLAndPOS(Sentence.listToString(sentence), sentenceNouns, sentenceDependencies);
+                    newSentence.setNouns(sentenceNouns);
+                    newSentence.setDependencies(sentenceDependencies);
+                    linkSRLAndPOS(newSentence);
+
+                    sentences.add(newSentence);
+                    newQuestion.addSentence(newSentence);
+
+                    questions.add(newQuestion);
                  }
+                lastSentence.setIsQuestionSentence(true);
             }
         } catch (final Exception e) {
             System.err.println("Cannot perform POS tagging new.");
         }
+        return questions;
     }
 
-    public static void linkSRLAndPOS(String questionText, Collection<Noun> nouns, Collection<TypedDependency> dependencies) {
-        LinkedHashSet<Triplet> triplets = sParser.getTripletsFromSRL(srl, questionText);
+    public static void linkSRLAndPOS(com.mathproblems.solver.facttuple.Sentence sentence) {
+        LinkedHashSet<Noun> nouns = sentence.getNouns();
+        Collection<TypedDependency> dependencies = sentence.getDependencies();
+        LinkedHashSet<Triplet> triplets = sParser.getTripletsFromSRL(srl, sentence.getSentenceText());
         System.out.println(triplets);
 
         System.out.println("------Merging Conj And Triplets------");
@@ -123,7 +141,12 @@ public class MainClass {
 
         LinkedHashSet<String> distinctSubjects = new LinkedHashSet<>();
         LinkedHashMap<Noun, Triplet> usefulTriplets = findUsefulTripletsAndTheirNouns(nounToTripletMap, distinctSubjects);
-        prepareEquationsForTriplets(usefulTriplets, distinctSubjects);
+
+        sentence.setTriplets(triplets);
+        sentence.setUsefulTriplets(usefulTriplets);
+
+        LinkedHashMap<Triplet, Equation> tripletToEquationMap = prepareEquationsForTriplets(usefulTriplets);
+        sentence.setEquations(tripletToEquationMap);
     }
 
     private static Collection<Triplet> getConjAndTriplets(Collection<TypedDependency> dependencies, Collection<Triplet> triplets) {
@@ -199,24 +222,25 @@ public class MainClass {
         return usefulTriplets;
     }
 
-    private static void prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets, LinkedHashSet<String> distinctSubjects) {
-        LinkedHashMap<String, Equation> subjectToEquationMap = new LinkedHashMap<>();
+    private static LinkedHashMap<Triplet, Equation> prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets) {
+        LinkedHashMap<Triplet, Equation> tripletToEquationMap = new LinkedHashMap<>();
 
         for(Map.Entry<Noun, Triplet> entry : usefulTriplets.entrySet()) {
             Triplet t = entry.getValue();
 
-            if(!subjectToEquationMap.containsKey(t.getSubjectTag())) {
-                subjectToEquationMap.put(t.getSubjectTag(), new Equation(t.getSubjectTag()));
+            if(!tripletToEquationMap.containsKey(t.getSubjectTag())) {
+                tripletToEquationMap.put(t, new Equation(t.getSubjectTag()));
             }
 
-            Equation e = subjectToEquationMap.get(t.getSubjectTag());
+            Equation e = tripletToEquationMap.get(t);
             e.associateTriplet(t, svmClassifier);
         }
 
-        for(Equation e: subjectToEquationMap.values()) {
+        for(Equation e: tripletToEquationMap.values()) {
             e.prettyPrintEquation();
             e.processEquation();
         }
+        return tripletToEquationMap;
     }
 
     private static boolean isNumber(String str) {

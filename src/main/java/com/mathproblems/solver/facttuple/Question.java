@@ -25,7 +25,7 @@ public class Question {
     }
 
     private boolean isQuestionSentence(final Sentence sentence) {
-        return false;
+        return sentence.getIsQuestionSentence();
     }
 
     @Override
