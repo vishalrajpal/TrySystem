@@ -75,6 +75,8 @@ public class MainClass {
                 com.mathproblems.solver.facttuple.Sentence lastSentence = null;
                 questionText = scanner.nextLine();
                 final Question newQuestion = new Question(questionText);
+                final LinkedHashMap<String, Equation> tripletToEquationMap = new LinkedHashMap<>();
+                newQuestion.setTripletToEquationMap(tripletToEquationMap);
                 /** New way to parse */
                 DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(questionText));
                 dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
@@ -110,13 +112,18 @@ public class MainClass {
 
                     newSentence.setNouns(sentenceNouns);
                     newSentence.setDependencies(sentenceDependencies);
-                    linkSRLAndPOS(newSentence);
+                    linkSRLAndPOS(newSentence, tripletToEquationMap);
 
                     sentences.add(newSentence);
                     newQuestion.addSentence(newSentence);
 
                     questions.add(newQuestion);
                  }
+
+                for(Equation e: tripletToEquationMap.values()) {
+                    e.prettyPrintEquation();
+                    e.processEquation();
+                }
                 lastSentence.setIsQuestionSentence(true);
             }
         } catch (final Exception e) {
@@ -125,7 +132,8 @@ public class MainClass {
         return questions;
     }
 
-    public static void linkSRLAndPOS(com.mathproblems.solver.facttuple.Sentence sentence) {
+    public static void linkSRLAndPOS(com.mathproblems.solver.facttuple.Sentence sentence,
+                                     LinkedHashMap<String, Equation> tripletToEquationMap) {
         LinkedHashSet<Noun> nouns = sentence.getNouns();
         Collection<TypedDependency> dependencies = sentence.getDependencies();
         LinkedHashSet<Triplet> triplets = sParser.getTripletsFromSRL(srl, sentence.getSentenceText());
@@ -145,8 +153,8 @@ public class MainClass {
         sentence.setTriplets(triplets);
         sentence.setUsefulTriplets(usefulTriplets);
 
-        LinkedHashMap<Triplet, Equation> tripletToEquationMap = prepareEquationsForTriplets(usefulTriplets);
-        sentence.setEquations(tripletToEquationMap);
+        prepareEquationsForTriplets(usefulTriplets, tripletToEquationMap);
+        //sentence.setEquations(tripletToEquationMap);
     }
 
     private static Collection<Triplet> getConjAndTriplets(Collection<TypedDependency> dependencies, Collection<Triplet> triplets) {
@@ -222,25 +230,18 @@ public class MainClass {
         return usefulTriplets;
     }
 
-    private static LinkedHashMap<Triplet, Equation> prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets) {
-        LinkedHashMap<Triplet, Equation> tripletToEquationMap = new LinkedHashMap<>();
-
+    private static void prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets,
+                                                                                LinkedHashMap<String, Equation> tripletToEquationMap) {
         for(Map.Entry<Noun, Triplet> entry : usefulTriplets.entrySet()) {
             Triplet t = entry.getValue();
 
             if(!tripletToEquationMap.containsKey(t.getSubjectTag())) {
-                tripletToEquationMap.put(t, new Equation(t.getSubjectTag()));
+                tripletToEquationMap.put(t.getSubjectTag(), new Equation(t.getSubjectTag()));
             }
 
-            Equation e = tripletToEquationMap.get(t);
+            Equation e = tripletToEquationMap.get(t.getSubjectTag());
             e.associateTriplet(t, svmClassifier);
         }
-
-        for(Equation e: tripletToEquationMap.values()) {
-            e.prettyPrintEquation();
-            e.processEquation();
-        }
-        return tripletToEquationMap;
     }
 
     private static boolean isNumber(String str) {

@@ -1,5 +1,9 @@
 package com.mathproblems.solver.facttuple;
 
+import com.mathproblems.solver.equationtool.Equation;
+import com.mathproblems.solver.equationtool.Triplet;
+
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -9,6 +13,8 @@ public class Question {
     private final LinkedHashSet<Sentence> allSentences;
     private final Set<Sentence> dataSentences;
     private Sentence questionSentence = null;
+    private LinkedHashMap<String, Equation> tripletToEquationMap;
+
     public Question(final String question) {
         this.question = question;
         allSentences = new LinkedHashSet<>();
@@ -44,5 +50,9 @@ public class Question {
 
     public String getQuestion() {
         return question;
+    }
+
+    public void setTripletToEquationMap(LinkedHashMap<String,Equation> tripletToEquationMap) {
+        this.tripletToEquationMap = tripletToEquationMap;
     }
 }

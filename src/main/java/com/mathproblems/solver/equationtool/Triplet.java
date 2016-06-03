@@ -61,6 +61,7 @@ public class Triplet {
         return match;
     }
 
+
     public void setSubjectQuantity(int quantity) {
         subjectQuantity = quantity;
     }

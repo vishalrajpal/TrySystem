@@ -31,8 +31,16 @@ public class Equation {
 
     public void prettyPrintEquation() {
         System.out.print(this.leftHandSide + " = ");
+        int currentQuantity;
+        String signTag;
         for(EquationObject eo: objectToQuantity) {
-            System.out.print(eo.getQuantity()+eo.getObjectTag());
+            currentQuantity = eo.getQuantity();
+            signTag = "+";
+            if(currentQuantity < 0) {
+                signTag = "-";
+                currentQuantity = -currentQuantity;
+            }
+            System.out.print(signTag + " " + currentQuantity + eo.getObjectTag() + " ");
         }
         System.out.println();
     }
