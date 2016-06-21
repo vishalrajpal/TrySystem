@@ -1,39 +1,18 @@
 package com.mathproblems.solver.partsofspeech;
 
 import com.mathproblems.solver.PennPOSTags;
-import srl.mateplus.MatePlusDeprel;
 
-public class Verb {
+public class Verb implements PartsOfSpeech {
 	private final int index;
 	private final String verb;
-	private final String lemma;
-	private final String subject;
-	private final MatePlusDeprel subjectDeprel;
-	private final String object;
-	private final MatePlusDeprel objectDeprel;
-	private final String adverb;
-	private final MatePlusDeprel adverbDeprel;
-	private final PennPOSTags tag;
+	private final boolean isConjAndVerb;
+
 	public Verb(final int index,
 				final String verb,
-				final PennPOSTags tag,
-				final String lemma,
-				final String subject,
-				final MatePlusDeprel subjectDeprel,
-				final String object,
-				final MatePlusDeprel objectDeprel,
-				final String adverb,
-				final MatePlusDeprel adverbDeprel) {
+				boolean isConjAndTriplet) {
 		this.index = index;
 		this.verb = verb;
-		this.tag = tag;
-		this.lemma = lemma;
-		this.subject = subject;
-		this.object = object;
-		this.adverb = adverb;
-		this.subjectDeprel = subjectDeprel;
-		this.objectDeprel = objectDeprel;
-		this.adverbDeprel = adverbDeprel;
+		this.isConjAndVerb = isConjAndTriplet;
 	}
 
 	public int getIndex() {
@@ -44,36 +23,38 @@ public class Verb {
 		return verb;
 	}
 
+	@Override
 	public PennPOSTags getTag() {
-		return tag;
+		if(this.isConjAndVerb) {
+			return PennPOSTags.CVB;
+		} else {
+			return PennPOSTags.VB;
+		}
 	}
 
-	public String getLemma() {
-		return lemma;
+	@Override
+	public int getGovernerIndex() {
+		return 0;
 	}
 
-	public String getSubject() {
-		return subject;
+	@Override
+	public int getDependentIndex() {
+		return index;
 	}
 
-	public String getObject() {
-		return object;
+	@Override
+	public String getGoverner() {
+		return null;
 	}
 
-	public MatePlusDeprel getSubjectDeprel() {
-		return subjectDeprel;
+	@Override
+	public String getDependent() {
+		return verb;
 	}
 
-	public MatePlusDeprel getObjectDeprel() {
-		return objectDeprel;
-	}
-
-	public String getAdverb() {
-		return adverb;
-	}
-
-	public MatePlusDeprel getAdverbDeprel() {
-		return adverbDeprel;
+	@Override
+	public int getQuantity() {
+		return 0;
 	}
 
 	@Override
@@ -81,14 +62,6 @@ public class Verb {
 		return "Verb{" +
 				"index=" + index +
 				", verb='" + verb + '\'' +
-				", lemma='" + lemma + '\'' +
-				", subject='" + subject + '\'' +
-				", subjectDeprel=" + subjectDeprel +
-				", object='" + object + '\'' +
-				", objectDeprel=" + objectDeprel +
-				", adverb='" + adverb + '\'' +
-				", adverbDeprel=" + adverbDeprel +
-				", tag=" + tag +
 				'}';
 	}
 }

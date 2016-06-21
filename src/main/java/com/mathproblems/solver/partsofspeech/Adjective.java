@@ -3,6 +3,7 @@ package com.mathproblems.solver.partsofspeech;
 import java.util.Collection;
 import java.util.List;
 
+import com.mathproblems.solver.PennPOSTags;
 import com.mathproblems.solver.PennRelation;
 import edu.stanford.nlp.trees.TypedDependency;
 import com.mathproblems.solver.partsofspeech.PartsOfSpeech;
@@ -40,7 +41,12 @@ public class Adjective implements PartsOfSpeech {
 		}
 		return parentNoun;
 	}
-	
+
+	@Override
+	public PennPOSTags getTag() {
+		return null;
+	}
+
 	@Override
 	public String toString() {
 		return "Adjective [dependency=" + dependency + ", word=" + dependent

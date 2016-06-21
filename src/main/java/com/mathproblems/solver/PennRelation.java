@@ -27,7 +27,9 @@ public enum PennRelation {
 	//nouns
 	nmod,
 	nmodof,
-	dobj,	
+	nmodposs,
+	dobj,
+	iobj,
 	root,
 	nsubj,
 	conj,
@@ -35,6 +37,7 @@ public enum PennRelation {
 	nsubjpass,
 	parataxis,
 	ccomp,
+	auxpass,
 	advcl;
 	
 	public static PennRelation valueOfPennRelation(String str) {
@@ -54,10 +57,16 @@ public enum PennRelation {
 				break;
 			case "nmod":
 				if(splitStr.length > 1) {
-					if(splitStr[1].equals("of")) {
-						str = "nmodof";
+					switch(splitStr[1]) {
+						case "of":
+							str = "nmodof";
+							break;
+						case "poss":
+							str="nmodposs";
+							break;
 					}
 				}
+				break;
 		}
 		return PennRelation.valueOf(str);		
 	}

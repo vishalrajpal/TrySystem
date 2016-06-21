@@ -16,19 +16,26 @@ public class Triplet {
 
     private Integer subjectQuantity;
     private Integer objectQuantity;
+    private boolean isConjAndTriplet;
 
     public Triplet(final String subject, final String subjectTag, final int subjectIndex,
                    final String verb, final String verbTag, final int verbIndex,
-                   final String object, final String objectTag, final int objectIndex) {
+                   final String object, final String objectTag, final int objectIndex, boolean isConjAndTriplet) {
+        this.isConjAndTriplet = isConjAndTriplet;
         this.subject = subject;
         this.subjectTag = subjectTag;
         this.subjectIndex = subjectIndex;
         this.verb = verb;
         this.verbTag = verbTag;
-        this.verbIndex = verbIndex;
+        if(isConjAndTriplet) {
+            this.verbIndex = objectIndex - 1;
+        } else {
+            this.verbIndex = verbIndex;
+        }
         this.object = object;
         this.objectTag = objectTag;
         this.objectIndex = objectIndex;
+
     }
 
     public boolean isEquivalentToPOSNoun(Noun n) {
@@ -112,6 +119,10 @@ public class Triplet {
 
     public int getObjectIndex() {
         return objectIndex;
+    }
+
+    public boolean isConjAndTriplet() {
+        return isConjAndTriplet;
     }
 
     @Override

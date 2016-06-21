@@ -1,28 +1,26 @@
 package com.mathproblems.solver;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.mathproblems.solver.classifier.SVMClassifier;
+import com.mathproblems.solver.equationtool.Equation;
 import com.mathproblems.solver.equationtool.Triplet;
 import com.mathproblems.solver.facttuple.Question;
 
-import com.mathproblems.solver.partsofspeech.Adjective;
-import com.mathproblems.solver.partsofspeech.Noun;
-import com.mathproblems.solver.partsofspeech.Verb;
+import com.mathproblems.solver.logisticregression.LogisticRegression;
+import com.mathproblems.solver.partsofspeech.*;
+import com.mathproblems.solver.ruletrees.EquationTree;
 import edu.stanford.nlp.trees.TypedDependency;
 import se.lth.cs.srl.CompletePipeline;
 import se.lth.cs.srl.corpus.Predicate;
 import se.lth.cs.srl.corpus.Sentence;
 import se.lth.cs.srl.corpus.Word;
-import srl.mateplus.MatePlusDeprel;
 import srl.mateplus.SRL;
 
 public class SmartParser {
-	
-	private static final Set<String> nounInGovernerList = new HashSet<>();
-	private static final Set<String> nounInDependentList = new HashSet<>();;
-	private static final Set<String> nounInBothList = new HashSet<>();
-	private static final Set<String> typeModifiersList = new HashSet<>();
-	private static final Set<String> numberList = new HashSet<>();
+
 	private static final Set<PennRelation> universalNounsList = new HashSet<>();
 	private static final Set<PennRelation> universalAdjectiveList = new HashSet<>();
 	private static final Set<PennRelation> universalVerbsList = new HashSet<>();
@@ -30,8 +28,9 @@ public class SmartParser {
 	//http://universaldependencies.org/docs/en/pos/NOUN.html
 	//omitting root
 	public static void initializeUniversalNouns() {
-		universalNounsList.add(PennRelation.nmod);
+		//universalNounsList.add(PennRelation.nmod);
 		universalNounsList.add(PennRelation.nmodof);
+		universalNounsList.add(PennRelation.nmodposs);
 		universalNounsList.add(PennRelation.dobj);
 		universalNounsList.add(PennRelation.compound);
 		//universalNounsList.add(PennTreeBankRelations.root);
@@ -109,7 +108,7 @@ public class SmartParser {
 			}
 		}
 		return verbList;
-	}*/
+	}
 
     public Collection<Verb> parseVerbsAccordingToSRL(SRL srl, String sentence) {
         Collection<Verb> verbs = new HashSet<>();
@@ -169,7 +168,7 @@ public class SmartParser {
 
         }
         return verbs;
-    }
+    }*/
 
 	public LinkedHashSet<Triplet> getTripletsFromSRL(SRL srl, String sentence) {
 		final LinkedHashSet<Triplet> triplets = new LinkedHashSet<>();
@@ -199,7 +198,7 @@ public class SmartParser {
 							objectIndex = arg.getIdx();
 						}
 					}
-					final Triplet triplet = new Triplet(subject, subjectTag, subjectIndex, verb, verbTag, verbIndex, object, objectTag, objectIndex);
+					final Triplet triplet = new Triplet(subject, subjectTag, subjectIndex, verb, verbTag, verbIndex, object, objectTag, objectIndex, false);
 					triplets.add(triplet);
 				}
 			}
@@ -237,6 +236,8 @@ public class SmartParser {
 			if(!n.getRelation().equals(PennRelation.compound)) {
 				final Collection<Noun> remove = n.mergeAllCompounds(nounList);
                 toRemove.addAll(remove);
+			} else {
+				n.mergeGovernerIndex();
 			}
 		}
         nounList.removeAll(toRemove);
@@ -274,7 +275,7 @@ public class SmartParser {
 		String currentRelation;
 		for(TypedDependency dependency: dependencies) {
 			currentRelation = dependency.reln().toString();
-			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nmodof)) {
+			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nmod)) {
 				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
 				nMods.add(dependency);
 			}
@@ -282,17 +283,45 @@ public class SmartParser {
 		return nMods;
 	}
 
-	public void mergeNmodsWithParsedNouns(List<TypedDependency> nMods, Collection<Noun> nounList) {
-		String dependent;
+	public void mergeNmodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
+		List<TypedDependency> nMods = getAllNmods(dependencies);
+		//String dependent;
+		String governer;
 		for(TypedDependency dependency: nMods) {
-			dependent = dependency.dep().originalText();
+			//dependent = dependency.dep().originalText();
+			governer = dependency.gov().originalText();
 			for(Noun n: nounList) {
-				if(dependent.equals(n.getDependent()) && dependency.dep().index() == n.getDependentIndex()) {
-					n.associateQuantity(dependency.gov().originalText());
+				if(governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
+					PartsOfSpeech nMod = new Noun(dependency);
+					n.mergeAdjective(nMod);
+					//n.associateQuantity(dependency.dep().originalText());
 					n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
 				}
 			}
 		}
+	}
+
+	private Collection<TypedDependency> getPrepositions(Collection<TypedDependency> dependencies) {
+		Collection<TypedDependency> prepositions = new LinkedHashSet<>();
+		String currentRelation;
+		for(TypedDependency dependency: dependencies) {
+			currentRelation = dependency.reln().toString();
+			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.penncase)) {
+				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
+				prepositions.add(dependency);
+			}
+		}
+		return prepositions;
+	}
+
+	public Collection<Preposition> mergePrepositionsOfParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nouns) {
+		Collection<TypedDependency> prepositionDependencies = getPrepositions(dependencies);
+		Collection<Preposition> prepositions = new LinkedHashSet<>();
+		for(TypedDependency preposition: prepositionDependencies) {
+			Preposition p = new Preposition(preposition, nouns);
+			prepositions.add(p);
+		}
+		return prepositions;
 	}
 
     public void removeDuplicateNouns(Collection<Noun> nouns) {
@@ -322,4 +351,361 @@ public class SmartParser {
             System.out.println(q);
         }
     }
+
+	public String extractFeatures(Gramlet gramlet, String sentence, int label, LinkedHashSet<Verb> verbs) {
+		final String ifWord = "if";
+		final String onlyWord = "only";
+
+		char splitChar = ' ';
+		char concatChar = ':';
+		String gramletString = gramlet.toString();
+
+		StringBuilder featuresString = new StringBuilder();
+		featuresString.append(label);
+
+
+		Map<Integer, Double> featureVector = new HashMap<>();
+		featureVector.putAll(LogisticRegression.defaultFeatureVector);
+
+		featureVector.put(gramlet.toString().hashCode(), 1.0);
+		featureVector.put(gramlet.lastChar().hashCode(), 1.0);
+		featureVector.put(LogisticRegression.NO_OF_VERBS_STRING.hashCode(), (double)gramlet.noOfVerbs());
+		featureVector.put(LogisticRegression.NO_OF_PREPOSITIONS_STRING.hashCode(), (double)gramlet.noOfPrepositions());
+		featureVector.put(LogisticRegression.CONTAINS_AND_CONJUNCTION_STRING.hashCode(), (double)gramlet.noOfCounjunctions());
+		featureVector.put(LogisticRegression.NO_OF_QUANTITIES_STRING.hashCode(), (double)gramlet.noOfQuantities());
+		featureVector.put(LogisticRegression.NO_OF_NOUNS_STRING.hashCode(), (double)gramlet.noOfNouns());
+		featureVector.put(LogisticRegression.CONTAINS_NVQN_PATTERN_STRING.hashCode(), gramlet.containsPattern("NVQN") ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.CONTAINS_VQ_PATTERN_STRING.hashCode(), gramlet.containsPattern("VQ") ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.CONTAINS_WORD_IF_STRING.hashCode(), sentence.toLowerCase().contains(ifWord) ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.CONTAINS_WORD_ONLY_STRING.hashCode(), sentence.toLowerCase().contains(onlyWord) ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.HAS_ZERO_QUANTITIES_STRING.hashCode(), gramlet.noOfQuantities() == 0 ? 1.0 : 0.0);
+
+		Pattern p = Pattern.compile("(some|most|several)");
+		Matcher m = p.matcher(sentence.toLowerCase());
+		featureVector.put(LogisticRegression.CONTAINS_UNKNOWN_QUANTITY_WORDS_STRING.hashCode(), m.find() ? 1.0 : 0.0);
+
+		/**one-hot encoding for verbs */
+		for(String category: SVMClassifier.importantCategories) {
+			featureVector.put(category.hashCode(), 0.0);
+		}
+
+		for(Verb verb: verbs) {
+			LinkedHashMap<String, Double> word2VecFeatures = VerbClassificationFeatures.runWord2Vec(verb.getVerb());
+			for(Map.Entry<String, Double> word2VecFeature: word2VecFeatures.entrySet()) {
+				double currentVal = featureVector.get(word2VecFeature.getKey().hashCode());
+				featureVector.put(word2VecFeature.getKey().hashCode(), currentVal + word2VecFeature.getValue());
+			}
+
+			LinkedHashMap<String, Double> wordNetFeatures = VerbClassificationFeatures.runWordNet(verb.getVerb());
+			for(Map.Entry<String, Double> wordNetFeature: wordNetFeatures.entrySet()) {
+				double currentVal = featureVector.get(wordNetFeature.getKey().hashCode());
+				featureVector.put(wordNetFeature.getKey().hashCode(), currentVal + wordNetFeature.getValue());
+			}
+		}
+		/** one hot encoding for verbs end */
+
+		for(Map.Entry<Integer, Double> entry: featureVector.entrySet()) {
+			featuresString.append(splitChar);
+			featuresString.append(entry.getKey());
+			featuresString.append(concatChar);
+			featuresString.append(entry.getValue());
+		}
+		return featuresString.toString();
+	}
+
+	public String extractFeatures1(Gramlet gramlet, String sentence, int label) {
+		/**
+		 * Gramlet
+		 * GramletLastCharacter
+		 * NoOfVerbs
+		 * NoOfPrepositions
+		 * NoOfConjunctions
+		 * NoOfQuantities
+		 * NoOfNouns
+		 * ContainsNVQNPattern
+		 * containsWordIF
+		 * containsWordONLY
+		 * containsUnknownQuantityWords
+		 * IsQuantityAfterVerb
+		 */
+		final String ifWord = "if";
+		final String onlyWord = "only";
+
+		char splitChar = ' ';
+		char concatChar = ':';
+		String gramletString = gramlet.toString();
+
+		int currentIndex = 1;
+		StringBuilder featuresString = new StringBuilder();
+		featuresString.append(label);
+		featuresString.append(splitChar);
+		/**1 Gramlet*/
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		//featuresString.append(gramlet.getFeatureValue());
+		featuresString.append(splitChar);
+
+		/**2 Last Character */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.lastChar());
+		featuresString.append(splitChar);
+
+		/** 3 No of Verbs */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.noOfVerbs());
+		featuresString.append(splitChar);
+
+		/** 4 No of Prepositions */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.noOfPrepositions());
+		featuresString.append(splitChar);
+
+		/** 5 No of Conjunctions */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.noOfCounjunctions());
+		featuresString.append(splitChar);
+
+
+		/** 6 No of Quantities */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.noOfQuantities());
+		featuresString.append(splitChar);
+
+		/** 7 No of Nouns */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.noOfNouns());
+		featuresString.append(splitChar);
+
+		/** 8 Contains Pattern NVQN */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.containsPattern("NVQN") ? 1 : 0);
+		featuresString.append(splitChar);
+
+		/** 9 Contains Pattern VQ */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(gramlet.containsPattern("VQ") ? 1 : 0);
+		featuresString.append(splitChar);
+
+		/** 10 Contains word 'If' */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(sentence.toLowerCase().contains(ifWord) ? 1 : 0);
+		featuresString.append(splitChar);
+
+		/** 11 Contains word 'only' */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		featuresString.append(sentence.toLowerCase().contains(onlyWord) ? 1 : 0);
+		featuresString.append(splitChar);
+
+		/** 12 Contains unknown quantity words 'some|most|several' */
+		featuresString.append(currentIndex++);
+		featuresString.append(concatChar);
+		Pattern p = Pattern.compile("(some|most|several)");
+		Matcher m = p.matcher(sentence.toLowerCase());
+		featuresString.append(m.find() ? 1 : 0);
+		featuresString.append(splitChar);
+
+		return featuresString.toString();
+	}
+
+	private static SRL srl;
+	private static SmartParser sParser;
+
+	public static void initializeSrlDependencies() {
+		final String lemmaPath = Thread.currentThread().getContextClassLoader().getResource("models/lemma-eng.model").getPath();
+		final String taggerPath = Thread.currentThread().getContextClassLoader().getResource("models/tagger-eng.model").getPath();
+		final String parserPath = Thread.currentThread().getContextClassLoader().getResource("models/parse-eng.model").getPath();
+		final String srlModelPath = Thread.currentThread().getContextClassLoader().getResource("models/srl-EMNLP14+fs-eng.model").getPath();
+		String[] pipelineOptions = new String[]{
+				"eng",					// language
+				"-lemma", lemmaPath,	// lemmatization mdoel
+				"-tagger", taggerPath,	// tagger model
+				"-parser", parserPath,	// parsing model
+				"-srl", srlModelPath,	// SRL model
+				"-tokenize",			// turn on word tokenization
+				"-reranker"				// turn on reranking (part of SRL)
+		};
+		srl = new SRL(pipelineOptions);
+		sParser = new SmartParser();
+	}
+
+	public static LinkedHashSet<Triplet> getTriplets(com.mathproblems.solver.facttuple.Sentence sentence, LinkedHashSet<Noun> nouns) {
+		Collection<TypedDependency> dependencies = sentence.getDependencies();
+		LinkedHashSet<Triplet> triplets = sParser.getTripletsFromSRL(srl, sentence.getSentenceText());
+		System.out.println(triplets);
+
+		System.out.println("------Merging Conj And Triplets------");
+		Collection<Triplet> conjAndTriplets = getConjAndTriplets(dependencies, triplets);
+		triplets.addAll(conjAndTriplets);
+		System.out.println("------After Merging Conj And Triplets------");
+		System.out.println(triplets);
+
+		Triplet lastObjectTriplet = null;
+		Triplet numberTriplet = null;
+		for(Triplet triplet: triplets) {
+			if(isNumber(triplet.getObject())) {
+				numberTriplet = triplet;
+				if(lastObjectTriplet != null) {
+					break;
+				}
+			} else {
+				lastObjectTriplet = triplet;
+			}
+		}
+
+		if(numberTriplet != null && lastObjectTriplet != null) {
+			for (Noun n : nouns) {
+				if (n.getDependentIndex() == numberTriplet.getObjectIndex()) {
+					n.associateQuantity(numberTriplet.getObject());
+					n.addSuffix(lastObjectTriplet.getObject());
+				}
+			}
+		}
+		return triplets;
+	}
+
+	public static LinkedHashSet<Verb> getVerbsFromTriplets(LinkedHashSet<Triplet> triplets) {
+		LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
+		for(Triplet triplet: triplets) {
+			verbs.add(new Verb(triplet.getVerbIndex(), triplet.getVerb(), triplet.isConjAndTriplet()));
+		}
+		return verbs;
+	}
+
+	public static Gramlet parsePOSToGramlet(SortedSet<PartsOfSpeech> nounsAndVerbs) {
+		StringBuilder sb = new StringBuilder();
+		for(PartsOfSpeech pos: nounsAndVerbs) {
+			if(PennPOSTagsLists.isANoun(pos.getTag().name())) {
+				if(pos.getQuantity() != 0) {
+					sb.append("Q");
+				}
+				sb.append("N");
+			} else if(PennPOSTagsLists.isAVerb(pos.getTag().name())) {
+				if(pos.getTag().equals(PennPOSTags.CVB)) {
+					sb.append("C");
+				} else {
+					sb.append("V");
+				}
+			} else if(pos.getTag().equals(PennPOSTags.PRP)) {
+				sb.append("P");
+			}
+		}
+		System.out.println(sb.toString());
+		return Gramlet.valueOfGramlet(sb.toString());
+	}
+
+	private static Collection<Triplet> getConjAndTriplets(Collection<TypedDependency> dependencies, Collection<Triplet> triplets) {
+		Collection<TypedDependency> conjAndDependencies = sParser.parserNounsWithConj(dependencies);
+
+		Collection<Triplet> conjAndTriplets = new ArrayList<>();
+		for(TypedDependency dependency: conjAndDependencies) {
+			Triplet newTriplet;
+			for(Triplet triplet: triplets) {
+				if(triplet.getSubject() != null && triplet.getSubject().equals(dependency.gov().originalText()) && triplet.getSubjectIndex() == dependency.gov().index()) {
+					newTriplet = new Triplet(dependency.dep().originalText(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
+							triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
+							triplet.getObject(), triplet.getObjectTag(), triplet.getObjectIndex(), true);
+					conjAndTriplets.add(newTriplet);
+					break;
+				} else if(triplet.getObject() != null && triplet.getObject().equals(dependency.gov().originalText()) && triplet.getObjectIndex() == dependency.gov().index()) {
+					newTriplet = new Triplet(triplet.getSubject(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
+							triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
+							dependency.dep().originalText(), triplet.getObjectTag(), dependency.dep().index(), true);
+					conjAndTriplets.add(newTriplet);
+					break;
+				}
+			}
+		}
+		return conjAndTriplets;
+	}
+
+	private static LinkedHashMap<Noun, Triplet> mergeNounsAndTriplets(Collection<Noun> nouns, Collection<Triplet> triplets) {
+		LinkedHashMap<Noun, Triplet> nounToTripletMap = new LinkedHashMap<>();
+		for(Noun sentenceNoun: nouns) {
+			for(Triplet triplet: triplets) {
+				if(triplet.isEquivalentToPOSNoun(sentenceNoun)) {
+					nounToTripletMap.put(sentenceNoun, triplet);
+					System.out.println("Possible link found.");
+					System.out.println("Sentence:" + sentenceNoun);
+					System.out.println("Triplet:" + triplet);
+				}
+			}
+		}
+		return nounToTripletMap;
+	}
+
+	private static LinkedHashMap<Noun, Triplet> findUsefulTripletsAndTheirNouns(LinkedHashMap<Noun, Triplet> nounToTripletMap, LinkedHashSet<String> distinctSubjects) {
+		LinkedHashMap<Noun, Triplet> usefulTriplets = new LinkedHashMap<>();
+		// boolean isATripletWithoutObject = false;
+		for(Map.Entry<Noun, Triplet> entry: nounToTripletMap.entrySet()) {
+
+			Noun n = entry.getKey();
+			Triplet t = entry.getValue();
+
+			if(n.getQuantity() != 0) {
+				if(t.matchesToSubject(n)) {
+					usefulTriplets.put(n, t);
+					t.setSubjectQuantity(n.getQuantity());
+					distinctSubjects.add(t.getSubjectTag());
+					System.out.println(n.getQuantity() + t.getSubjectTag() + " " + t.getVerb() + " " + t.getObjectTag());
+				} else if(t.matchesToObject(n)) {
+					usefulTriplets.put(n, t);
+					t.setObjectQuantity(n.getQuantity());
+					distinctSubjects.add(t.getSubjectTag());
+					System.out.println(t.getSubjectTag() + " " + t.getVerb() + " " + n.getQuantity() + t.getObjectTag());
+				}
+			} else if (isNumber(t.getSubject()) && t.matchesToSubject(n)) {
+				usefulTriplets.put(n, t);
+				t.setSubjectQuantity(Integer.parseInt(t.getSubject()));
+				distinctSubjects.add(t.getSubjectTag());
+				System.out.println(t.getSubject() + t.getSubjectTag() + " " + t.getVerb() + " " + t.getObjectTag());
+			} else if(isNumber(t.getObject()) && t.matchesToObject(n)) {
+				usefulTriplets.put(n, t);
+				t.setObjectQuantity(Integer.parseInt(t.getObject()));
+				distinctSubjects.add(t.getSubjectTag());
+				System.out.println(t.getSubjectTag() + " " + t.getVerb() + " " + t.getObject() + t.getObjectTag());
+			}
+		}
+		return usefulTriplets;
+	}
+
+	private static void prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets,
+													Question question,
+													LinkedHashMap<String, Equation> tripletToEquationMap,
+													LinkedHashMap<Question, EquationTree> equationTrees) {
+        /*for(Map.Entry<Noun, Triplet> entry : usefulTriplets.entrySet()) {
+            Triplet t = entry.getValue();
+
+            if(!tripletToEquationMap.containsKey(t.getSubjectTag())) {
+                tripletToEquationMap.put(t.getSubjectTag(), new Equation(t.getSubjectTag()));
+            }
+
+            Equation e = tripletToEquationMap.get(t.getSubjectTag());
+            e.associateTriplet(t, svmClassifier);
+        }*/
+		try {
+			final EquationTree equationTree = equationTrees.get(question);
+			equationTree.addTriplets(usefulTriplets);
+		} catch (final Exception e) {
+			System.err.println("Cannot create equation tree." + question.getQuestion());
+		}
+	}
+
+	private static boolean isNumber(String str) {
+		try {
+			Integer.parseInt(str);
+		} catch (final Exception e) {
+			return false;
+		}
+		return true;
+	}
 }

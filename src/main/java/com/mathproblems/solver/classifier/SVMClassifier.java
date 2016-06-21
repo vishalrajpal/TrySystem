@@ -171,9 +171,9 @@ public class SVMClassifier {
         }
 
         svm_parameter param = new svm_parameter();
-        param.gamma = 0.0078125;
+        param.gamma = 0.5;
         //param.nu = 0.1;
-        param.C = 262144.0;
+        param.C = 8192.0;
 
         param.svm_type = svm_parameter.C_SVC;
         param.kernel_type = svm_parameter.RBF;

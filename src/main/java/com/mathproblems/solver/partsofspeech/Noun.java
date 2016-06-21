@@ -2,13 +2,14 @@ package com.mathproblems.solver.partsofspeech;
 
 import java.util.*;
 
+import com.mathproblems.solver.PennPOSTags;
 import com.mathproblems.solver.PennRelation;
 import edu.stanford.nlp.trees.TypedDependency;
 
 public class Noun implements PartsOfSpeech {
 
 	private final String dependent;
-	private final String nounType;
+	private final PennPOSTags nounType;
 	private final PennRelation relation;
 	private final TypedDependency dependency;
 	private final int dependentIndex;
@@ -17,13 +18,15 @@ public class Noun implements PartsOfSpeech {
 	private final String governer;
 	private int quantity;
 	private final Map<String, Integer> relatedNouns;
+	private final LinkedHashSet<Preposition> prepositions;
 	final SortedSet<Integer> indices;
+	private StringBuilder suffixString;
 	public Noun (TypedDependency dependency) {
 		this.dependency = dependency;
 		governer = dependency.gov().originalText();
 		dependent = dependency.dep().originalText();
 		relation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());
-		nounType = dependency.dep().tag();
+		nounType = PennPOSTags.valueOf(dependency.dep().tag());
 		dependentIndex = dependency.dep().index();
 		governerIndex = dependency.gov().index();
 		mergedCompounds = new TreeSet<PartsOfSpeech>(new Comparator<PartsOfSpeech>() {
@@ -36,6 +39,21 @@ public class Noun implements PartsOfSpeech {
 		relatedNouns.put(dependent, dependentIndex);
 		indices = new TreeSet<>();
 		indices.add(dependentIndex);
+		suffixString = new StringBuilder();
+		prepositions = new LinkedHashSet<>();
+
+		if(nounType.equals(PennPOSTags.CD) && isANumber(dependent)) {
+			associateQuantity(dependent);
+		}
+	}
+//Jason found 49 seashells on the beach . He gave 13 of the seashells to Tim . How many seashells does Jason now have ?
+	private boolean isANumber(String str) {
+		try {
+			Integer.parseInt(str);
+			return true;
+		} catch(Exception e) {
+			return false;
+		}
 	}
 	
 	public String getDependent() {
@@ -44,7 +62,7 @@ public class Noun implements PartsOfSpeech {
 	public String getGoverner() {
 		return governer;
 	}
-	public String getNounType() {
+	public PennPOSTags getTag() {
 		return nounType;
 	}
 	public PennRelation getRelation() {
@@ -65,7 +83,7 @@ public class Noun implements PartsOfSpeech {
 		for(PartsOfSpeech pos: mergedCompounds) {
 			sb.append(pos.getDependent() + " ");
 		}
-		return sb.toString();
+		return sb.toString() + suffixString.toString();
 	}
 	
 	public int getDependentIndex() {
@@ -107,6 +125,14 @@ public class Noun implements PartsOfSpeech {
 		mergedCompounds.add(adjective);
 		indices.add(adjective.getDependentIndex());
 	}
+
+	public void mergeGovernerIndex() {
+		addSuffix(governer);
+		associateIndex(governer, governerIndex);
+	}
+	public void addSuffix(String suffix) {
+		suffixString.append(" " + suffix);
+	}
 	
 	public void associateQuantity(String quantity) {
 		try {
@@ -118,6 +144,10 @@ public class Noun implements PartsOfSpeech {
 
 	public void associateIndex(String relatedNoun, Integer index) {
 		this.relatedNouns.put(relatedNoun, index);
+	}
+
+	public void associatePreposition(Preposition p) {
+		this.prepositions.add(p);
 	}
 
 	public int getQuantity() {

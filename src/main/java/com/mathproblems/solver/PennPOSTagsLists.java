@@ -14,12 +14,15 @@ public class PennPOSTagsLists {
 		PENN_NOUN_TAGS.add(PennPOSTags.NNP);
 		PENN_NOUN_TAGS.add(PennPOSTags.NNPS);
 		PENN_NOUN_TAGS.add(PennPOSTags.CD);
+		PENN_NOUN_TAGS.add(PennPOSTags.PRP$);
+		PENN_NOUN_TAGS.add(PennPOSTags.PRP);
 
 		PENN_ADJECTIVE_TAGS.add(PennPOSTags.JJ);
 		
 		PENN_VERB_TAGS.add(PennPOSTags.VBD);
 		PENN_VERB_TAGS.add(PennPOSTags.VBN);
 		PENN_VERB_TAGS.add(PennPOSTags.VB);
+		PENN_VERB_TAGS.add(PennPOSTags.CVB);
 	}
 	
 	public static boolean isANoun(String tag) {
