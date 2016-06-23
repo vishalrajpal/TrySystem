@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.mathproblems.solver.PennPOSTags;
 import com.mathproblems.solver.PennRelation;
+import com.mathproblems.solver.logisticregression.LogisticRegression;
 import edu.stanford.nlp.trees.TypedDependency;
 
 public class Noun implements PartsOfSpeech {
@@ -23,8 +24,11 @@ public class Noun implements PartsOfSpeech {
 	private StringBuilder suffixString;
 	public Noun (TypedDependency dependency) {
 		this.dependency = dependency;
-		governer = dependency.gov().originalText();
-		dependent = dependency.dep().originalText();
+		governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+		dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+		//governer = dependency.gov().originalText();
+		//dependent = dependency.dep().originalText();
+
 		relation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());
 		nounType = PennPOSTags.valueOf(dependency.dep().tag());
 		dependentIndex = dependency.dep().index();
@@ -157,4 +161,45 @@ public class Noun implements PartsOfSpeech {
 	public Map<String, Integer> getIndices() {
 		return relatedNouns;
 	}
+
+	private LinkedHashMap<Noun, String> relatedAnswerNouns = new LinkedHashMap<>();
+
+	public void initializeRelatedNouns(String predictedLabel) {
+		relatedAnswerNouns.put(this, predictedLabel);
+	}
+
+	public boolean relateNounToAnswerIfMatches(Map.Entry<Noun, String> entry, boolean toAdd) {
+		String smartString = this.toSmartString();
+		String otherSmartString = entry.getKey().toSmartString();
+
+		String[] thisSplit = smartString.split(" ");
+		//String[] otherSplit = otherSmartString.split(" ");
+
+		for(String splitElement: thisSplit) {
+			if(otherSmartString.contains(splitElement)) {
+				if(toAdd && entry.getKey().getQuantity() != 0) {
+					relatedAnswerNouns.put(entry.getKey(), entry.getValue());
+				}
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public double getAnswer() {
+		double result = 0.0;
+		int sign;
+		for (Map.Entry<Noun, String> relatedAnswerNoun : relatedAnswerNouns.entrySet()) {
+			sign = 1;
+			String predictedLabel = relatedAnswerNoun.getValue();
+			Noun n = relatedAnswerNoun.getKey();
+			if (LogisticRegression.operatorToNumberMap.get(predictedLabel) == 2) {
+				sign = -sign;
+			}
+			result = result + (sign * n.getQuantity());
+		}
+		return result;
+	}
+
 }

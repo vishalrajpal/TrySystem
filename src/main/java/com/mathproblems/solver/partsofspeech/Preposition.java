@@ -18,9 +18,11 @@ public class Preposition implements PartsOfSpeech {
     private final Noun attachedNoun;
     private final String prepositionLabel;
     public Preposition(TypedDependency dependency, Collection<Noun> nouns) {
-        this.dependent = dependency.dep().originalText();
+        //this.dependent = dependency.dep().originalText();
+        this.dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
         this.dependentIndex = dependency.dep().index();
-        this.governer = dependency.gov().originalText();
+        //this.governer = dependency.gov().originalText();
+        this.governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
         this.governerIndex = dependency.gov().index();
         this.dependency = dependency;
         this.relation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());

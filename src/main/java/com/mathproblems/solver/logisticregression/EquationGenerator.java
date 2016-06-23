@@ -2,6 +2,7 @@ package com.mathproblems.solver.logisticregression;
 
 import com.mathproblems.solver.MainClass;
 import com.mathproblems.solver.PennPOSTagsLists;
+import com.mathproblems.solver.PennRelation;
 import com.mathproblems.solver.SmartParser;
 import com.mathproblems.solver.equationtool.Triplet;
 import com.mathproblems.solver.facttuple.Question;
@@ -29,16 +30,16 @@ public class EquationGenerator {
     private static DependencyParser parser;
     private static MaxentTagger tagger;
     static {
-        //parser = DependencyParser.loadFromModelFile("models/english_UD.gz");
+        parser = DependencyParser.loadFromModelFile("models/english_UD.gz");
 
-        //tagger = new MaxentTagger("models/english-left3words/english-left3words-distsim.tagger");
-        lp = LexicalizedParser.loadModel("models/englishPCFG.ser.gz");
+        tagger = new MaxentTagger("models/english-left3words/english-left3words-distsim.tagger");
+        //lp = LexicalizedParser.loadModel("models/englishPCFG.ser.gz");
         //lp.setOptionFlags(new String[] { "-maxLength", "80",
           //      "-retainTmpSubcategories" });
-        //tlp = new PennTreebankLanguagePack();
-        //gsf = tlp.grammaticalStructureFactory();
+        tlp = new PennTreebankLanguagePack();
+        gsf = tlp.grammaticalStructureFactory();
 
-        gsf = lp.treebankLanguagePack().grammaticalStructureFactory();
+        //gsf = lp.treebankLanguagePack().grammaticalStructureFactory();
 
         PennPOSTagsLists.initializeTagLists();
         SmartParser.initializeUniversalNouns();
@@ -63,9 +64,9 @@ public class EquationGenerator {
         String updatedQuestionText = getConjAndSplitQuestion(questionText);
 
         DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(updatedQuestionText));
-        dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
+        //dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
 
-        //dp.setTokenizerFactory(tlp.getTokenizerFactory());
+        dp.setTokenizerFactory(tlp.getTokenizerFactory());
         StringBuilder equationBuilder = new StringBuilder();
         double result = 0.0;
         Map<Noun, String> nounToPredictedLabel = new LinkedHashMap<>();
@@ -74,11 +75,11 @@ public class EquationGenerator {
             final String sentenceText = Sentence.listToString(sentenceWordList);
 
 
-            final Tree sentenceTree = lp.parseTree(sentenceWordList);
-            final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
+            //final Tree sentenceTree = lp.parseTree(sentenceWordList);
+            //final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
 
-            //List<TaggedWord> tagged = tagger.tagSentence(sentenceWordList);
-            //final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
+            List<TaggedWord> tagged = tagger.tagSentence(sentenceWordList);
+            final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
 
             final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
@@ -143,8 +144,14 @@ public class EquationGenerator {
                 equationBuilder.append(" X");
             } else if(predictedLabel == 4) {
                 if(adjectives.size() > 0) {
-                    Noun questionNoun = new Noun(adjectives.get(0).getDependency());
-                    nounToPredictedLabel.put(questionNoun, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                    for(Noun n: sentenceNouns) {
+                        if(n.getRelation().equals(PennRelation.dobj)) {
+                            nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                            break;
+                        }
+                    }
+                    /*Noun questionNoun = new Noun(adjectives.get(0).getDependency());
+                    nounToPredictedLabel.put(questionNoun, LogisticRegression.numberToOperatorMap.get(predictedLabel));*/
                 }
                 equationBuilder.append("= ?");
             } else {
@@ -162,8 +169,41 @@ public class EquationGenerator {
             }
         }
         equationBuilder.append(" -> " + result);
+        printResultFromMap(nounToPredictedLabel);
         //System.out.println("\n"+equationBuilder.toString() + " -> " + result);
         return equationBuilder.toString();
+    }
+
+    private void printResultFromMap(Map<Noun, String> nounToPredictedLabel) {
+        Map.Entry<Noun, String> questionEntry = null;
+
+        for(Map.Entry<Noun, String> entry: nounToPredictedLabel.entrySet()) {
+            Noun entryNoun = entry.getKey();
+            String entryLabel = entry.getValue();
+            if(entryLabel.equals("?")) {
+                questionEntry = entry;
+                continue;
+            }
+            for(Map.Entry<Noun, String> matchingEntry: nounToPredictedLabel.entrySet()) {
+                Noun matchingNoun = matchingEntry.getKey();
+                String matchingLabel = matchingEntry.getValue();
+                if(!matchingEntry.equals(entry) && !matchingLabel.equals("?")) {
+                    entryNoun.relateNounToAnswerIfMatches(matchingEntry, true);
+                }
+            }
+        }
+
+        if(questionEntry != null) {
+            for (Map.Entry<Noun, String> entry : nounToPredictedLabel.entrySet()) {
+                Noun entryNoun = entry.getKey();
+                String entryLabel = entry.getValue();
+                entryNoun.initializeRelatedNouns(entryLabel);
+                if (entryNoun.relateNounToAnswerIfMatches(questionEntry, false)) {
+                    System.out.println("Answer from related nouns:" + entryNoun.getAnswer());
+                    break;
+                }
+            }
+        }
     }
 
     private String getConjAndSplitQuestion(String questionText) {
@@ -183,10 +223,10 @@ public class EquationGenerator {
 
                 StringReader firstSentenceReader = new StringReader(firstSentence);
                 DocumentPreprocessor firstSentenceList = new DocumentPreprocessor(firstSentenceReader);
-                final Tree sentenceTree = lp.parseTree(firstSentenceList.iterator().next());
-                final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
-                //List<TaggedWord> tagged = tagger.tagSentence(firstSentenceList.iterator().next());
-                //final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
+                //final Tree sentenceTree = lp.parseTree(firstSentenceList.iterator().next());
+                //final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
+                List<TaggedWord> tagged = tagger.tagSentence(firstSentenceList.iterator().next());
+                final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
                 final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
                 System.out.println("------Parsing Nouns------");

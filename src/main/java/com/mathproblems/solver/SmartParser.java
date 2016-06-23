@@ -247,10 +247,12 @@ public class SmartParser {
 		String dependencyGoverner;
 		List<TypedDependency> numMods = getAllNummods(dependencies);
 		for(TypedDependency dependency: numMods) {
-			dependencyGoverner = dependency.gov().originalText();
+			//dependencyGoverner = dependency.gov().originalText();
+			dependencyGoverner = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 			for(Noun n: nounList) {
 				if(dependencyGoverner.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
-					n.associateQuantity(dependency.dep().originalText());
+					String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+					n.associateQuantity(dep);
 				}
 			}
 			
@@ -276,7 +278,9 @@ public class SmartParser {
 		for(TypedDependency dependency: dependencies) {
 			currentRelation = dependency.reln().toString();
 			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nmod)) {
-				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
+				String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				String gov = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				System.out.println(dependency.toString() + " : " + dep + ":" + gov);
 				nMods.add(dependency);
 			}
 		}
@@ -289,13 +293,15 @@ public class SmartParser {
 		String governer;
 		for(TypedDependency dependency: nMods) {
 			//dependent = dependency.dep().originalText();
-			governer = dependency.gov().originalText();
+			//governer = dependency.gov().originalText();
+			governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 			for(Noun n: nounList) {
 				if(governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
 					PartsOfSpeech nMod = new Noun(dependency);
 					n.mergeAdjective(nMod);
 					//n.associateQuantity(dependency.dep().originalText());
-					n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
+					//n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
+					n.associateIndex(governer, dependency.gov().index());
 				}
 			}
 		}
@@ -307,7 +313,9 @@ public class SmartParser {
 		for(TypedDependency dependency: dependencies) {
 			currentRelation = dependency.reln().toString();
 			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.penncase)) {
-				System.out.println(dependency.toString() + " : " + dependency.dep().toString() + ":" + dependency.gov().originalText());
+				String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				String gov = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				System.out.println(dependency.toString() + " : " + dep + ":" + gov);
 				prepositions.add(dependency);
 			}
 		}
@@ -610,16 +618,18 @@ public class SmartParser {
 		for(TypedDependency dependency: conjAndDependencies) {
 			Triplet newTriplet;
 			for(Triplet triplet: triplets) {
-				if(triplet.getSubject() != null && triplet.getSubject().equals(dependency.gov().originalText()) && triplet.getSubjectIndex() == dependency.gov().index()) {
-					newTriplet = new Triplet(dependency.dep().originalText(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
+				String gov = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				if(triplet.getSubject() != null && triplet.getSubject().equals(gov) && triplet.getSubjectIndex() == dependency.gov().index()) {
+					newTriplet = new Triplet(dep, triplet.getSubjectTag(), triplet.getSubjectIndex(),
 							triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
 							triplet.getObject(), triplet.getObjectTag(), triplet.getObjectIndex(), true);
 					conjAndTriplets.add(newTriplet);
 					break;
-				} else if(triplet.getObject() != null && triplet.getObject().equals(dependency.gov().originalText()) && triplet.getObjectIndex() == dependency.gov().index()) {
+				} else if(triplet.getObject() != null && triplet.getObject().equals(gov) && triplet.getObjectIndex() == dependency.gov().index()) {
 					newTriplet = new Triplet(triplet.getSubject(), triplet.getSubjectTag(), triplet.getSubjectIndex(),
 							triplet.getVerb(), triplet.getVerbTag(), triplet.getVerbIndex(),
-							dependency.dep().originalText(), triplet.getObjectTag(), dependency.dep().index(), true);
+							dep, triplet.getObjectTag(), dependency.dep().index(), true);
 					conjAndTriplets.add(newTriplet);
 					break;
 				}
