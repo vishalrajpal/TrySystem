@@ -114,7 +114,17 @@ public enum Gramlet {
     NNVNN,
     QNNN,
     NVVNN,
-    NVQNVQNN;
+    NVQNVQNN,
+    NVQNQNCN,
+    NNVQNNN,
+    QNNVNNVN,
+    NVQNNQNN,
+    QNNVNNV,
+    QNV,
+    NVQNQN,
+    NVQNNNNVQNVN,
+    NVQNNNNN,
+    NQNV;
 
     public static void addToLexicon(Map<String, Integer> lexicon) {
 

@@ -38,7 +38,8 @@ public enum PennRelation {
 	parataxis,
 	ccomp,
 	auxpass,
-	advcl;
+	advcl,
+	punct;
 	
 	public static PennRelation valueOfPennRelation(String str) {
 		//str = str.split(":")[0];

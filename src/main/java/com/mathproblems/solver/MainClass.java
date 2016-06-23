@@ -219,19 +219,19 @@ public class MainClass {
         //MainClass.runClausie(null);
 
         /** Perform our own POS tagging.*/
-        //LogisticRegression.prepareLexicon();
-        //MainClass.initializeComponents();
+        /*LogisticRegression.prepareLexicon();
+        MainClass.initializeComponents();
         //MainClass.performPOSTagging("test.txt", "test_features.txt");
-        //MainClass.performPOSTagging("test_training_sentences.txt", "training_sentences_features.txt");
-        //MainClass.performPOSTagging("test_testing_sentences.txt", "testing_sentences_features.txt");
+        MainClass.performPOSTagging("test_training_sentences.txt", "training_sentences_features.txt");
+        MainClass.performPOSTagging("test_testing_sentences.txt", "testing_sentences_features.txt");*/
         LogisticRegression.prepareLexicon();
         final String trainingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/training_sentences_features.txt").getPath();
         final String testingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/testing_sentences_features.txt").getPath();
         LogisticRegression lr1 = new LogisticRegression(12, 1, 0.0001, -1.0, 100, 1);
         lr1.train(trainingFilePath, testingFilePath, 15);
 
-        LogisticRegression lr2 = new LogisticRegression(12, 2, 0.1, -1.0, 200, 1);
-        lr2.train(trainingFilePath, testingFilePath, 11);
+        LogisticRegression lr2 = new LogisticRegression(12, 2, 0.001, -1.0, 200, 1);
+        lr2.train(trainingFilePath, testingFilePath, 13);
 
         LogisticRegression lr3 = new LogisticRegression(12, 3, 0.01, 0.0, 200, 1);
         lr3.train(trainingFilePath, testingFilePath, 4);

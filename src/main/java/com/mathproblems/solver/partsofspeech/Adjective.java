@@ -18,6 +18,7 @@ public class Adjective implements PartsOfSpeech {
 	private final int governerIndex;
 	private final String governer;
 	private final Noun parentNoun;
+	public boolean hasParentNoun = false;
 	public Adjective (TypedDependency dependency, Collection<Noun> nounList) {
 		this.dependency = dependency;
 		final String[] currentDependency = dependency.dep().toString().split("/");
@@ -36,6 +37,7 @@ public class Adjective implements PartsOfSpeech {
 			if(n.getDependent().equals(governer) && n.getDependentIndex() == governerIndex) {
 				parentNoun = n;
 				n.mergeAdjective(this);
+				hasParentNoun= true;
 				break;
 			}
 		}
@@ -71,5 +73,9 @@ public class Adjective implements PartsOfSpeech {
 	
 	public int getQuantity() {
 		return 0;
+	}
+
+	public TypedDependency getDependency() {
+		return this.dependency;
 	}
 }

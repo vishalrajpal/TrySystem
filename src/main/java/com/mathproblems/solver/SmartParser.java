@@ -603,7 +603,7 @@ public class SmartParser {
 		return Gramlet.valueOfGramlet(sb.toString());
 	}
 
-	private static Collection<Triplet> getConjAndTriplets(Collection<TypedDependency> dependencies, Collection<Triplet> triplets) {
+	public static Collection<Triplet> getConjAndTriplets(Collection<TypedDependency> dependencies, Collection<Triplet> triplets) {
 		Collection<TypedDependency> conjAndDependencies = sParser.parserNounsWithConj(dependencies);
 
 		Collection<Triplet> conjAndTriplets = new ArrayList<>();
@@ -628,7 +628,7 @@ public class SmartParser {
 		return conjAndTriplets;
 	}
 
-	private static LinkedHashMap<Noun, Triplet> mergeNounsAndTriplets(Collection<Noun> nouns, Collection<Triplet> triplets) {
+	public static LinkedHashMap<Noun, Triplet> mergeNounsAndTriplets(Collection<Noun> nouns, Collection<Triplet> triplets) {
 		LinkedHashMap<Noun, Triplet> nounToTripletMap = new LinkedHashMap<>();
 		for(Noun sentenceNoun: nouns) {
 			for(Triplet triplet: triplets) {
