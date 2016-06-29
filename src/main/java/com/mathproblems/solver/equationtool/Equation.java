@@ -10,7 +10,7 @@ public class Equation {
     private final String tag;
     private final String leftHandSide;
     private final LinkedList<EquationObject> objectToQuantity;
-    private final HashMap<String, Integer> objectValues;
+    private final HashMap<String, Double> objectValues;
     public Equation(String tag) {
         this. tag = tag;
         this.leftHandSide = this.tag;
@@ -21,7 +21,7 @@ public class Equation {
 
     public void associateTriplet(Triplet t, SVMClassifier svmClassifier) {
 
-        int objectQuantity = t.getObjectQuantity();
+        double objectQuantity = t.getObjectQuantity();
         if(svmClassifier.libSVMClassify(t.getVerb()) == -1.0) {
             objectQuantity = -objectQuantity;
         }
@@ -31,7 +31,7 @@ public class Equation {
 
     public void prettyPrintEquation() {
         System.out.print(this.leftHandSide + " = ");
-        int currentQuantity;
+        double currentQuantity;
         String signTag;
         for(EquationObject eo: objectToQuantity) {
             currentQuantity = eo.getQuantity();

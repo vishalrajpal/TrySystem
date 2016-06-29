@@ -71,11 +71,20 @@ public class Adjective implements PartsOfSpeech {
 		return dependent;
 	}
 	
-	public int getQuantity() {
+	public double getQuantity() {
 		return 0;
 	}
 
 	public TypedDependency getDependency() {
 		return this.dependency;
+	}
+
+	@Override
+	public String getGramletCharacter() {
+		return null;
+	}
+
+	public String getDependentWithQuantity() {
+		return getDependent();
 	}
 }

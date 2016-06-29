@@ -53,7 +53,7 @@ public class Verb implements PartsOfSpeech {
 	}
 
 	@Override
-	public int getQuantity() {
+	public double getQuantity() {
 		return 0;
 	}
 
@@ -63,5 +63,33 @@ public class Verb implements PartsOfSpeech {
 				"index=" + index +
 				", verb='" + verb + '\'' +
 				'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Verb verb1 = (Verb) o;
+
+		if (getIndex() != verb1.getIndex()) return false;
+		return getVerb().equals(verb1.getVerb());
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getIndex();
+		result = 31 * result + getVerb().hashCode();
+		return result;
+	}
+
+	@Override
+	public String getGramletCharacter() {
+		return "V";
+	}
+
+	public String getDependentWithQuantity() {
+		return getDependent();
 	}
 }

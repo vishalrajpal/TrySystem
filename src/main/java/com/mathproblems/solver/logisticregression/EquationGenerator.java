@@ -1,9 +1,6 @@
 package com.mathproblems.solver.logisticregression;
 
-import com.mathproblems.solver.MainClass;
-import com.mathproblems.solver.PennPOSTagsLists;
-import com.mathproblems.solver.PennRelation;
-import com.mathproblems.solver.SmartParser;
+import com.mathproblems.solver.*;
 import com.mathproblems.solver.equationtool.Triplet;
 import com.mathproblems.solver.facttuple.Question;
 import com.mathproblems.solver.partsofspeech.*;
@@ -25,10 +22,10 @@ public class EquationGenerator {
     private static LexicalizedParser lp;
     private static TreebankLanguagePack tlp;
     private static GrammaticalStructureFactory gsf;
-    private static SmartParser sParser;
+    public static SmartParser sParser;
     private static SRL srl;
-    private static DependencyParser parser;
-    private static MaxentTagger tagger;
+    public static DependencyParser parser;
+    public static MaxentTagger tagger;
     static {
         parser = DependencyParser.loadFromModelFile("models/english_UD.gz");
 
@@ -61,8 +58,8 @@ public class EquationGenerator {
 
     public String getEquation() {
         // Use sentence splitter here and create multiple sentences in case of conj ands..
-        String updatedQuestionText = getConjAndSplitQuestion(questionText);
-
+        //String updatedQuestionText = getConjAndSplitQuestion(questionText);
+        String updatedQuestionText = SentenceParser.parseQuestion(questionText);
         DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(updatedQuestionText));
         //dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
 
@@ -84,7 +81,7 @@ public class EquationGenerator {
             final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
             System.out.println("------Parsing Nouns------");
-            final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies);
+            final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, sentenceText);
             System.out.println("------After Parsing Nouns------");
             sParser.printProcessedNouns(sentenceNouns);
 
@@ -104,7 +101,7 @@ public class EquationGenerator {
             sParser.printProcessedNouns(sentenceNouns);
 
             System.out.println("------Merging Nmods------");
-            sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+            sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
             System.out.println("------After Merging Nmods------");
             sParser.printProcessedNouns(sentenceNouns);
 
@@ -120,7 +117,13 @@ public class EquationGenerator {
 
             LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
 
-            LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
+            //LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
+            LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
+            verbs.addAll(SmartParser.parseVerbsBasedOnDependencies(sentenceDependencies));
+
+            LinkedHashSet<Expletive> expletives = SmartParser.parseExpletivesBasedOnDependencies(sentenceDependencies);
+            LinkedHashSet<Conjunction> conjunctions = SmartParser.parserNounsWithConjAnds(sentenceDependencies);
+            LinkedHashSet<WHAdverb> whAdverbs = SmartParser.parseWHAdverbsBasedOnDependencies(sentenceDependencies);
 
             SortedSet<PartsOfSpeech> nounsAndVerbs = new TreeSet<>(new Comparator<PartsOfSpeech>() {
                 @Override
@@ -136,16 +139,26 @@ public class EquationGenerator {
             nounsAndVerbs.addAll(sentenceNouns);
             nounsAndVerbs.addAll(verbs);
             nounsAndVerbs.addAll(prepositions);
-            Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs);
+            nounsAndVerbs.addAll(expletives);
+            nounsAndVerbs.addAll(whAdverbs);
+            nounsAndVerbs.addAll(conjunctions);
+
+            Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs, null);
             String featureString = sParser.extractFeatures(g, sentenceText, -1, verbs);
-            int predictedLabel = LogisticRegression.predictSingleSentence(featureString, allClassifiers);
+            Map<Integer, Double> classToLabel = new HashMap<>();
+            LogisticRegression best =  LogisticRegression.predictSingleSentence(featureString, allClassifiers, classToLabel);
+
+            int predictedLabel = best.getTargetClass();
+            if(g.noOfQuantities() != 0 && (predictedLabel==3 || predictedLabel==4)) {
+                predictedLabel = classToLabel.get(1) > classToLabel.get(2) ? 1 : 2;
+            }
 
             if(predictedLabel == 3) {
                 equationBuilder.append(" X");
             } else if(predictedLabel == 4) {
                 if(adjectives.size() > 0) {
                     for(Noun n: sentenceNouns) {
-                        if(n.getRelation().equals(PennRelation.dobj)) {
+                        if(n.getRelation().equals(PennRelation.dobj) || n.getRelation().equals(PennRelation.nsubj) || n.getRelation().equals(PennRelation.nsubjpass)) {
                             nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
                             break;
                         }
@@ -214,9 +227,8 @@ public class EquationGenerator {
         for(List<HasWord> currentSentence: splitter) {
 
             String currentSentenceString = Sentence.listToOriginalTextString(currentSentence);
-
-            if(currentSentenceString.toLowerCase().contains("and")) {
-                String[] split = currentSentenceString.split("and");
+            String[] split = currentSentenceString.split("(\\band\\b)+");
+            if(split.length == 2) {
                 String firstSentence = split[0] + ".";
                 sb.append(firstSentence);
                 com.mathproblems.solver.facttuple.Sentence s = new com.mathproblems.solver.facttuple.Sentence(firstSentence, null);
@@ -230,7 +242,7 @@ public class EquationGenerator {
                 final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
                 System.out.println("------Parsing Nouns------");
-                final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies);
+                final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, firstSentence);
                 System.out.println("------After Parsing Nouns------");
                 sParser.printProcessedNouns(sentenceNouns);
 
@@ -250,7 +262,7 @@ public class EquationGenerator {
                 sParser.printProcessedNouns(sentenceNouns);
 
                 System.out.println("------Merging Nmods------");
-                sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, currentSentenceString);
                 System.out.println("------After Merging Nmods------");
                 sParser.printProcessedNouns(sentenceNouns);
 

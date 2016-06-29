@@ -14,8 +14,8 @@ public class Triplet {
     private final String objectTag;
     private final int objectIndex;
 
-    private Integer subjectQuantity;
-    private Integer objectQuantity;
+    private Double subjectQuantity;
+    private Double objectQuantity;
     private boolean isConjAndTriplet;
 
     public Triplet(final String subject, final String subjectTag, final int subjectIndex,
@@ -69,19 +69,19 @@ public class Triplet {
     }
 
 
-    public void setSubjectQuantity(int quantity) {
+    public void setSubjectQuantity(double quantity) {
         subjectQuantity = quantity;
     }
 
-    public void setObjectQuantity(int quantity) {
+    public void setObjectQuantity(double quantity) {
         objectQuantity = quantity;
     }
 
-    public Integer getSubjectQuantity() {
+    public Double getSubjectQuantity() {
         return subjectQuantity;
     }
 
-    public Integer getObjectQuantity() {
+    public Double getObjectQuantity() {
         return objectQuantity;
     }
 

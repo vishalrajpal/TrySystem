@@ -25,7 +25,11 @@ public enum PennPOSTags {
 	NNP,
 	NNPS,
 	WRB,
-	NOT_FOUND;
+	NOT_FOUND,
+	$,
+	EX,
+	PREP,
+	TO;
 
 	public static PennPOSTags valueOfNullable(String value) {
 		PennPOSTags tag;

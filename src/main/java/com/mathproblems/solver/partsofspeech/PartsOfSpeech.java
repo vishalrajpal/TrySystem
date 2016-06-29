@@ -8,6 +8,8 @@ public interface PartsOfSpeech {
 	public int getDependentIndex();
 	public String getGoverner();
 	public String getDependent();
-	public int getQuantity();
+	public String getDependentWithQuantity();
+	public double getQuantity();
 	public PennPOSTags getTag();
+	public String getGramletCharacter();
 }

@@ -33,7 +33,7 @@ public class Preposition implements PartsOfSpeech {
     private Noun findAttachedNoun(Collection<Noun> nouns) {
         Noun attachedNoun = null;
         for(Noun n: nouns) {
-            if(n.getIndices().containsKey(this.getGoverner()) && n.getIndices().containsValue(this.governerIndex)) {
+            if(n.getRelatedNouns().containsKey(this.getGoverner()) && n.getRelatedNouns().containsValue(this.governerIndex)) {
                 attachedNoun = n;
                 n.associatePreposition(this);
                 break;
@@ -63,12 +63,21 @@ public class Preposition implements PartsOfSpeech {
     }
 
     @Override
-    public int getQuantity() {
+    public double getQuantity() {
         return 0;
     }
 
     @Override
     public PennPOSTags getTag() {
-        return PennPOSTags.PRP;
+        return PennPOSTags.PREP;
+    }
+
+    @Override
+    public String getGramletCharacter() {
+        return "P";
+    }
+
+    public String getDependentWithQuantity() {
+        return getDependent();
     }
 }

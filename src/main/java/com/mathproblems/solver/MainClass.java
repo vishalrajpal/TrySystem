@@ -20,7 +20,6 @@ import java.io.*;
 import java.util.*;
 
 import edu.stanford.nlp.trees.*;
-import srl.mateplus.SRL;
 
 public class MainClass {
 
@@ -98,7 +97,7 @@ public class MainClass {
                     final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
                     System.out.println("------Parsing Nouns------");
-                    final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies);
+                    final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, sentenceText);
                     System.out.println("------After Parsing Nouns------");
                     sParser.printProcessedNouns(sentenceNouns);
 
@@ -118,7 +117,7 @@ public class MainClass {
                     sParser.printProcessedNouns(sentenceNouns);
 
                     System.out.println("------Merging Nmods------");
-                    sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                    sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
                     System.out.println("------After Merging Nmods------");
                     sParser.printProcessedNouns(sentenceNouns);
 
@@ -131,7 +130,13 @@ public class MainClass {
                     newSentence.setDependencies(sentenceDependencies);
 
                     LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
-                    LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
+                    //LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
+                    LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
+                    verbs.addAll(SmartParser.parseVerbsBasedOnDependencies(sentenceDependencies));
+
+                    LinkedHashSet<Expletive> expletives = SmartParser.parseExpletivesBasedOnDependencies(sentenceDependencies);
+                    LinkedHashSet<Conjunction> conjunctions = SmartParser.parserNounsWithConjAnds(sentenceDependencies);
+                    LinkedHashSet<WHAdverb> whAdverbs = SmartParser.parseWHAdverbsBasedOnDependencies(sentenceDependencies);
 
                     SortedSet<PartsOfSpeech> nounsAndVerbs = new TreeSet<>(new Comparator<PartsOfSpeech>() {
                         @Override
@@ -147,7 +152,11 @@ public class MainClass {
                     nounsAndVerbs.addAll(sentenceNouns);
                     nounsAndVerbs.addAll(verbs);
                     nounsAndVerbs.addAll(prepositions);
-                    Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs);
+                    nounsAndVerbs.addAll(expletives);
+                    nounsAndVerbs.addAll(whAdverbs);
+                    nounsAndVerbs.addAll(conjunctions);
+
+                    Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs, null);
                     String featureString = sParser.extractFeatures(g, sentenceText, label, verbs);
                     bWriter.write(featureString + "\n");
                     System.out.println(featureString);
@@ -225,21 +234,22 @@ public class MainClass {
         MainClass.performPOSTagging("test_training_sentences.txt", "training_sentences_features.txt");
         MainClass.performPOSTagging("test_testing_sentences.txt", "testing_sentences_features.txt");*/
         LogisticRegression.prepareLexicon();
+
         final String trainingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/training_sentences_features.txt").getPath();
         final String testingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/testing_sentences_features.txt").getPath();
-        LogisticRegression lr1 = new LogisticRegression(12, 1, 0.0001, -1.0, 100, 1);
-        lr1.train(trainingFilePath, testingFilePath, 15);
+        LogisticRegression lr1 = new LogisticRegression(12, 1, 0.0001, -1.5, 100, 1);
+        lr1.train(trainingFilePath, testingFilePath, 10);
 
-        LogisticRegression lr2 = new LogisticRegression(12, 2, 0.001, -1.0, 200, 1);
-        lr2.train(trainingFilePath, testingFilePath, 13);
+        LogisticRegression lr2 = new LogisticRegression(12, 2, 0.0005, -1.0, 200, 1);
+        lr2.train(trainingFilePath, testingFilePath, 14);
 
         LogisticRegression lr3 = new LogisticRegression(12, 3, 0.01, 0.0, 200, 1);
-        lr3.train(trainingFilePath, testingFilePath, 4);
+        lr3.train(trainingFilePath, testingFilePath, 7);
 
         LogisticRegression lr4 = new LogisticRegression(12, 4, 0.001, 0.0, 200, 1);
-        lr4.train(trainingFilePath, testingFilePath, 8);
+        lr4.train(trainingFilePath, testingFilePath, 3);
 
-       List<LogisticRegression> allClassifiers = new ArrayList<>();
+        List<LogisticRegression> allClassifiers = new ArrayList<>();
         allClassifiers.add(lr1);
         allClassifiers.add(lr2);
         allClassifiers.add(lr3);
@@ -276,6 +286,7 @@ public class MainClass {
         for(String str: equationAndResults) {
             System.out.println(str);
         }*/
+
 
 
     }

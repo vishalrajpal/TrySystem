@@ -56,7 +56,7 @@ public class SmartParser {
 		universalVerbsList.add(PennRelation.penncase);
 	}
 	
-	public LinkedHashSet<Noun> parseNounsAccordingToUniversalDependencyTags(Collection<TypedDependency> dependencies) {
+	public LinkedHashSet<Noun> parseNounsAccordingToUniversalDependencyTags(Collection<TypedDependency> dependencies, String sentenceText) {
 		String currentRelation;
 		LinkedHashSet<Noun> nounList = new LinkedHashSet<>();
         Set<Integer> dependentIndices = new HashSet<>();
@@ -66,7 +66,7 @@ public class SmartParser {
                     && PennPOSTagsLists.isANoun(dependency.dep().tag())
                     && !dependentIndices.contains(dependency.dep().index())) {
 				//System.out.println(dependency.toString() + " : " + dependency.dep().toString());
-				final Noun n = new Noun(dependency);
+				final Noun n = new Noun(dependency, sentenceText);
 				//System.out.println(n.getDependent());
 				nounList.add(n);
                 dependentIndices.add(n.getDependentIndex());
@@ -84,7 +84,20 @@ public class SmartParser {
 		}
 		return conjAndDependencies;
 	}
-	
+
+	public static LinkedHashSet<Conjunction> parserNounsWithConjAnds(Collection<TypedDependency> dependencies) {
+		LinkedHashSet<Conjunction> conjAndDependencies = new LinkedHashSet<>();
+		for(TypedDependency dependency : dependencies) {
+			if (PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.cc)) {
+				Conjunction c = new Conjunction(dependency.dep().index(), dependency.dep().toString(), dependency.dep().tag());
+				conjAndDependencies.add(c);
+			}
+		}
+		return conjAndDependencies;
+	}
+
+
+
 	public List<Adjective> mergeAdjectivesOfParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
 		String currentRelation;
 		List<Adjective> adjectiveList = new ArrayList<>();
@@ -184,7 +197,8 @@ public class SmartParser {
 				if (p.getPOS().startsWith("VB")) {
 					subject = subjectTag = object = objectTag = null;
 					subjectIndex = objectIndex = 0;
-					verb = p.getLemma();
+					verb = p.getForm();
+					//verb = p.getLemma();
 					verbTag = p.getPOS();
 					verbIndex = p.getIdx();
 					for (Word arg : p.getArgMap().keySet()) {
@@ -244,13 +258,14 @@ public class SmartParser {
 	}
 	
 	public void mergeNummodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
-		String dependencyGoverner;
+		//String dependencyGoverner;
 		List<TypedDependency> numMods = getAllNummods(dependencies);
 		for(TypedDependency dependency: numMods) {
 			//dependencyGoverner = dependency.gov().originalText();
-			dependencyGoverner = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			//dependencyGoverner = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 			for(Noun n: nounList) {
-				if(dependencyGoverner.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
+				//if(dependencyGoverner.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
+				if(n.getIndices().contains(dependency.gov().index())) {
 					String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 					n.associateQuantity(dep);
 				}
@@ -287,22 +302,29 @@ public class SmartParser {
 		return nMods;
 	}
 
-	public void mergeNmodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
+	public void mergeNmodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList, String sentenceText) {
 		List<TypedDependency> nMods = getAllNmods(dependencies);
 		//String dependent;
 		String governer;
+		boolean foundMatch;
 		for(TypedDependency dependency: nMods) {
 			//dependent = dependency.dep().originalText();
 			//governer = dependency.gov().originalText();
+			foundMatch = false;
 			governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 			for(Noun n: nounList) {
 				if(governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
-					PartsOfSpeech nMod = new Noun(dependency);
+					foundMatch = true;
+					PartsOfSpeech nMod = new Noun(dependency, n.getSentenceText());
 					n.mergeAdjective(nMod);
 					//n.associateQuantity(dependency.dep().originalText());
 					//n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
 					n.associateIndex(governer, dependency.gov().index());
 				}
+			}
+
+			if(!foundMatch) {
+				nounList.add(new Noun(dependency, sentenceText));
 			}
 		}
 	}
@@ -387,6 +409,7 @@ public class SmartParser {
 		featureVector.put(LogisticRegression.CONTAINS_WORD_IF_STRING.hashCode(), sentence.toLowerCase().contains(ifWord) ? 1.0 : 0.0);
 		featureVector.put(LogisticRegression.CONTAINS_WORD_ONLY_STRING.hashCode(), sentence.toLowerCase().contains(onlyWord) ? 1.0 : 0.0);
 		featureVector.put(LogisticRegression.HAS_ZERO_QUANTITIES_STRING.hashCode(), gramlet.noOfQuantities() == 0 ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.HAS_WHADVERB_STRING.hashCode(), gramlet.hasWHAdverb() ? 1.0 : 0.0);
 
 		Pattern p = Pattern.compile("(some|most|several)");
 		Matcher m = p.matcher(sentence.toLowerCase());
@@ -526,7 +549,7 @@ public class SmartParser {
 	}
 
 	private static SRL srl;
-	private static SmartParser sParser;
+	public static SmartParser sParser;
 
 	public static void initializeSrlDependencies() {
 		final String lemmaPath = Thread.currentThread().getContextClassLoader().getResource("models/lemma-eng.model").getPath();
@@ -589,10 +612,17 @@ public class SmartParser {
 		return verbs;
 	}
 
-	public static Gramlet parsePOSToGramlet(SortedSet<PartsOfSpeech> nounsAndVerbs) {
+	public static Gramlet parsePOSToGramlet(SortedSet<PartsOfSpeech> nounsAndVerbs, LinkedHashMap<PartsOfSpeech, String> gramletCharToStringMapping) {
 		StringBuilder sb = new StringBuilder();
 		for(PartsOfSpeech pos: nounsAndVerbs) {
-			if(PennPOSTagsLists.isANoun(pos.getTag().name())) {
+			String gramletChar = pos.getGramletCharacter();
+			if(gramletChar != null) {
+				sb.append(gramletChar);
+				if(gramletCharToStringMapping != null) {
+					gramletCharToStringMapping.put(pos, pos.getDependentWithQuantity());
+				}
+			}
+			/*if(PennPOSTagsLists.isANoun(pos.getTag().name())) {
 				if(pos.getQuantity() != 0) {
 					sb.append("Q");
 				}
@@ -603,9 +633,12 @@ public class SmartParser {
 				} else {
 					sb.append("V");
 				}
-			} else if(pos.getTag().equals(PennPOSTags.PRP)) {
+			} else if(pos.getTag().equals(PennPOSTags.PREP)) {
 				sb.append("P");
-			}
+			} else if(pos.getTag().equals(PennPOSTags.EX)) {
+				sb.append("E");
+			}*/
+
 		}
 		System.out.println(sb.toString());
 		return Gramlet.valueOfGramlet(sb.toString());
@@ -686,6 +719,51 @@ public class SmartParser {
 			}
 		}
 		return usefulTriplets;
+	}
+
+	public static LinkedHashSet<Verb> parseVerbsBasedOnDependencies(Collection<TypedDependency> dependencies) {
+		LinkedHashSet<Verb> dependencyVerbs = new LinkedHashSet<>();
+		for(TypedDependency dependency: dependencies) {
+			String depTag = dependency.dep().tag();
+			String govTag = dependency.gov().tag();
+			if(depTag != null && PennPOSTagsLists.isAVerb(depTag)) {
+				String verb = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				Verb newVerb = new Verb(dependency.dep().index(), verb, false);
+				dependencyVerbs.add(newVerb);
+			} else if(govTag != null && PennPOSTagsLists.isAVerb(govTag)) {
+				String verb = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				Verb newVerb = new Verb(dependency.gov().index(), verb, false);
+				dependencyVerbs.add(newVerb);
+			}
+		}
+		return dependencyVerbs;
+	}
+
+	public static LinkedHashSet<WHAdverb> parseWHAdverbsBasedOnDependencies(Collection<TypedDependency> dependencies) {
+		LinkedHashSet<WHAdverb> dependencyWHAdverbs = new LinkedHashSet<>();
+		for(TypedDependency dependency: dependencies) {
+			String depTag = dependency.dep().tag();
+			if(PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.advmod) &&
+					PennPOSTags.valueOfNullable(depTag).equals(PennPOSTags.WRB)) {
+				String whAdverb = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				WHAdverb newWhAdverb = new WHAdverb(dependency.dep().index(), whAdverb, depTag);
+				dependencyWHAdverbs.add(newWhAdverb);
+			}
+		}
+		return dependencyWHAdverbs;
+	}
+
+	public static LinkedHashSet<Expletive> parseExpletivesBasedOnDependencies(Collection<TypedDependency> dependencies) {
+		LinkedHashSet<Expletive> dependencyExpletives = new LinkedHashSet<>();
+		for(TypedDependency dependency: dependencies) {
+			String relation = dependency.reln().toString();
+			if(PennRelation.valueOfPennRelation(relation).equals(PennRelation.expl)) {
+				String expletive = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				Expletive newExpletive = new Expletive(dependency.dep().index(), expletive, dependency.dep().tag());
+				dependencyExpletives.add(newExpletive);
+			}
+		}
+		return dependencyExpletives;
 	}
 
 	private static void prepareEquationsForTriplets(LinkedHashMap<Noun, Triplet> usefulTriplets,

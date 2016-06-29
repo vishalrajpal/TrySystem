@@ -5,8 +5,8 @@ import java.util.LinkedHashSet;
 public class EquationObject {
 
     private final String objectTag;
-    private final Integer quantity;
-    public EquationObject(String objectTag, Integer quantity) {
+    private final Double quantity;
+    public EquationObject(String objectTag, Double quantity) {
         this.objectTag = objectTag;
         this.quantity = quantity;
     }
@@ -15,7 +15,7 @@ public class EquationObject {
         return objectTag;
     }
 
-    public Integer getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 }

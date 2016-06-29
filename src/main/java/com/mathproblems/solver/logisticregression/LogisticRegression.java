@@ -8,20 +8,21 @@ import java.util.*;
 
 public class LogisticRegression {
 
-    public static int predictSingleSentence(String sentenceText, List<LogisticRegression> allClassifiers) {
+    public static LogisticRegression predictSingleSentence(String sentenceText, List<LogisticRegression> allClassifiers, Map<Integer, Double> labelToPrediction) {
         LRInstance instance = new LRInstance(sentenceText);
         double maxPrediction = Double.MIN_VALUE;
         LogisticRegression bestHypotheses = null;
         for(LogisticRegression lr: allClassifiers) {
             double currentPrediction = lr.test(instance);
             System.out.print(lr.targetClass + ":" + currentPrediction + " ");
+            labelToPrediction.put(lr.targetClass, currentPrediction);
             if(currentPrediction > maxPrediction) {
                 maxPrediction = currentPrediction;
                 bestHypotheses = lr;
             }
             maxPrediction = Math.max(maxPrediction, currentPrediction);
         }
-        return bestHypotheses.targetClass;
+        return bestHypotheses;
     }
 
     public static void predictMultiClass(String testingFilePath, List<LogisticRegression> allClassifiers) {
@@ -95,6 +96,7 @@ public class LogisticRegression {
     public static final String CONTAINS_UNKNOWN_QUANTITY_WORDS_STRING = "containsUnknownQuantityWords";
     public static final String IS_QUANTITY_AFTER_VERB_STRING = "isQuantityAfterVerb";
     public static final String HAS_ZERO_QUANTITIES_STRING = "hasZeroQuantities";
+    public static final String HAS_WHADVERB_STRING = "hasWhAdverb";
 
     public static Map<String, Integer> operatorToNumberMap = new HashMap<>();
     public static Map<Integer, String> numberToOperatorMap = new HashMap<>();
@@ -115,6 +117,7 @@ public class LogisticRegression {
         otherFeatureNames.add(CONTAINS_UNKNOWN_QUANTITY_WORDS_STRING);
         otherFeatureNames.add(IS_QUANTITY_AFTER_VERB_STRING);
         otherFeatureNames.add(HAS_ZERO_QUANTITIES_STRING);
+        otherFeatureNames.add(HAS_WHADVERB_STRING);
 
         for(String str: otherFeatureNames) {
             lexiconDictionary.put(str, str.hashCode());
@@ -349,7 +352,11 @@ public class LogisticRegression {
         double result = 0.0;
 
         for(Feature feature: featureVector) {
-            result += feature.getFeatureValue() * parameterOrWeightVector.get(feature.getFeatureKey());
+            try {
+                result += feature.getFeatureValue() * parameterOrWeightVector.get(feature.getFeatureKey());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 //
 //
@@ -373,4 +380,7 @@ public class LogisticRegression {
         return getSigmoidFunctionValue(instance.getFeatureVector());
     }
 
+    public int getTargetClass() {
+        return targetClass;
+    }
 }

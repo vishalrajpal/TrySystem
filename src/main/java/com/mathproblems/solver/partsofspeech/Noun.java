@@ -17,13 +17,15 @@ public class Noun implements PartsOfSpeech {
 	private final int governerIndex;
 	private final SortedSet<PartsOfSpeech> mergedCompounds;
 	private final String governer;
-	private int quantity;
+	private double quantity;
 	private final Map<String, Integer> relatedNouns;
 	private final LinkedHashSet<Preposition> prepositions;
-	final SortedSet<Integer> indices;
+	private final SortedSet<Integer> indices;
 	private StringBuilder suffixString;
-	public Noun (TypedDependency dependency) {
+	private String sentenceText;
+	public Noun (TypedDependency dependency, String sentenceText) {
 		this.dependency = dependency;
+		this.sentenceText=sentenceText;
 		governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 		dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 		//governer = dependency.gov().originalText();
@@ -38,7 +40,7 @@ public class Noun implements PartsOfSpeech {
 				return o1.getDependentIndex() - o2.getDependentIndex();
 			}
 		});
-		mergedCompounds.add(this);
+
 		relatedNouns = new LinkedHashMap<>();
 		relatedNouns.put(dependent, dependentIndex);
 		indices = new TreeSet<>();
@@ -48,6 +50,8 @@ public class Noun implements PartsOfSpeech {
 
 		if(nounType.equals(PennPOSTags.CD) && isANumber(dependent)) {
 			associateQuantity(dependent);
+		} else {
+			mergedCompounds.add(this);
 		}
 	}
 //Jason found 49 seashells on the beach . He gave 13 of the seashells to Tim . How many seashells does Jason now have ?
@@ -89,7 +93,22 @@ public class Noun implements PartsOfSpeech {
 		}
 		return sb.toString() + suffixString.toString();
 	}
-	
+
+	public String toJoinedString() {
+		StringBuilder sb = new StringBuilder();
+		for(PartsOfSpeech pos: mergedCompounds) {
+			sb.append(pos.getDependent());
+			if(!pos.equals(mergedCompounds.last())) {
+				sb.append("-");
+			}
+		}
+		return sb.toString();
+	}
+
+	public String getSentenceText() {
+		return sentenceText;
+	}
+
 	public int getDependentIndex() {
 		return dependentIndex;
 	}
@@ -103,7 +122,9 @@ public class Noun implements PartsOfSpeech {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Noun noun = (Noun) o;
-		return getDependent().equals(noun.getDependent()) && getDependentIndex() == noun.getDependentIndex();
+		return getDependent().equals(noun.getDependent())
+				&& getDependentIndex() == noun.getDependentIndex()
+				&& this.sentenceText.equals(noun.sentenceText);
 	}
 
 	@Override
@@ -140,7 +161,7 @@ public class Noun implements PartsOfSpeech {
 	
 	public void associateQuantity(String quantity) {
 		try {
-			this.quantity = Integer.parseInt(quantity);
+			this.quantity = Double.parseDouble(quantity);
 		} catch (NumberFormatException e) {
 			System.err.println("Error parsing number:" + quantity);
 		}
@@ -154,21 +175,32 @@ public class Noun implements PartsOfSpeech {
 		this.prepositions.add(p);
 	}
 
-	public int getQuantity() {
+	public double getQuantity() {
 		return quantity;
 	}
 
-	public Map<String, Integer> getIndices() {
-		return relatedNouns;
+	public Set<Integer> getIndices() {
+		return indices;
 	}
 
 	private LinkedHashMap<Noun, String> relatedAnswerNouns = new LinkedHashMap<>();
+	private LinkedHashMap<Noun, String> relatedAnswerMergedNouns = new LinkedHashMap<>();
 
 	public void initializeRelatedNouns(String predictedLabel) {
 		relatedAnswerNouns.put(this, predictedLabel);
+		relatedAnswerMergedNouns.put(this, predictedLabel);
 	}
 
 	public boolean relateNounToAnswerIfMatches(Map.Entry<Noun, String> entry, boolean toAdd) {
+
+		String thisJoinedString = this.toJoinedString();
+		String otherJoinedString = entry.getKey().toJoinedString();
+
+		if(thisJoinedString.contains(otherJoinedString) || otherJoinedString.contains(thisJoinedString)) {
+			relatedAnswerMergedNouns.put(entry.getKey(), entry.getValue());
+		}
+		System.out.println(thisJoinedString + " : " + otherJoinedString);
+
 		String smartString = this.toSmartString();
 		String otherSmartString = entry.getKey().toSmartString();
 
@@ -183,7 +215,6 @@ public class Noun implements PartsOfSpeech {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -199,7 +230,41 @@ public class Noun implements PartsOfSpeech {
 			}
 			result = result + (sign * n.getQuantity());
 		}
+
+		double mergedResult = 0.0;
+
+		for (Map.Entry<Noun, String> relatedAnswerMergedNoun : relatedAnswerMergedNouns.entrySet()) {
+			sign = 1;
+			String predictedLabel = relatedAnswerMergedNoun.getValue();
+			Noun n = relatedAnswerMergedNoun.getKey();
+			if (LogisticRegression.operatorToNumberMap.get(predictedLabel) == 2) {
+				sign = -sign;
+			}
+			mergedResult = mergedResult + (sign * n.getQuantity());
+		}
+		System.out.println("Answer from merged nouns:" + mergedResult);
 		return result;
 	}
 
+	public Map<String, Integer> getRelatedNouns() {
+		return relatedNouns;
+	}
+
+	@Override
+	public String getGramletCharacter() {
+		String gramletChar = "";
+		if(quantity != 0) {
+			gramletChar = "Q";
+		}
+		gramletChar += "N";
+		return gramletChar;
+	}
+
+	public String getDependentWithQuantity() {
+		/*String depWithQuantity = "";
+		if(getQuantity() != 0) {
+			depWithQuantity = getQuantity() + " ";
+		}*/
+		return toSmartString();
+	}
 }
