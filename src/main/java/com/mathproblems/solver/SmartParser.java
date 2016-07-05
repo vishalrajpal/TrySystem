@@ -565,7 +565,7 @@ public class SmartParser {
 				"-tokenize",			// turn on word tokenization
 				"-reranker"				// turn on reranking (part of SRL)
 		};
-		srl = new SRL(pipelineOptions);
+		//srl = new SRL(pipelineOptions);
 		sParser = new SmartParser();
 	}
 

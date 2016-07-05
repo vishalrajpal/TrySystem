@@ -1,8 +1,154 @@
 package com.mathproblems.solver.partsofspeech;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public enum Gramlet {
+/**
+ * Created by Rajpals on 7/3/16.
+ */
+public enum FeatureGramlet {
+
+    /*NPNVQN,
+    NVQNNVQNCNVQNPNN,
+    QNPVVWNVNV,
+    NVQNPNNCQNPN,
+    PNNVQN,
+    NNVNQN,
+    NVQNCQN,
+    NVQNPPNNCVQNVN,
+    WNVNVV,
+    NVNPNN,
+    NNVNQNCNNVNQN,
+    NVNPNP,
+    NVQNCNVQNPNN,
+    NVVPNP,
+    NVPNN,
+    NVVPNN,
+    WNPVNV,
+    NVNWNEVPN,
+    NVQNVPN,
+    WVN,
+    NVVNCVQN,
+    NNVQNPN,
+    PNNNNVQNCQN,
+    PNNVQNPPNVN,
+    NVQNPN,
+    NVVQN,
+    NNVQN,
+    WNV,
+    PNNVQNPN,
+    NVQNV,
+    WNVNVVN,
+    EVQNPPN,
+    PNPNVQN,
+    WVNVPN,
+    WNVPN,
+    EVQNP,
+    NVNPN,
+    NVQNP,
+    QNPVVNWNVVN,
+    NVQNN,
+    NVQNPNPN,
+    NVVPN,
+    WNNVNVP,
+    NVQNCQNN,
+    NVN,
+    WNVNV,
+    WVNVVN,
+    PNNNVQN,
+    NVQNPNN,
+    NVQNPNP,
+    EVNPN,
+    WNVVEVPN,
+    NNVQNCQN,
+    NPNVQNN,
+    WNNVWNVV,
+    WNVNVPN,
+    PNNVQNCEVN,
+    NVPNCVNV,
+    NVVN,
+    NVQNPNCQNPN,
+    NVPNWNVQNPN,
+    WNVNVPNN,
+    EVQNPN,
+    NVNN,
+    WNVEPN,
+    NVQNPNCQNPNN,
+    NVNP,
+    EVQN,
+    NVNV,
+    WVNVN,
+    NVQNPNWNNV,
+    WNVPNN,
+    WNVVN,
+    QNVV,
+    VNNVQNV,
+    WVNVV,
+    WNVEPNN,
+    NV,
+    NVQNPPN,
+    WVNV,
+    NVNPNNPN,
+    NVQNPNPCVQNPNN,
+    NVQNCQNPNNN,
+    PNWNVNV,
+    WNVPWNVV,
+    NVQNNVQN,
+    NVPN,
+    NVVQNVV,
+    WNVNVNPN,
+    NVNQNPWNVNVP,
+    NPNPVQNV,
+    NVQNCVQNP,
+    NPNVN,
+    WNVP,
+    NVQNCNVQNPN,
+    WNVVPN,
+    WNVV,
+    PNPNNVQN,
+    WNVNVN,
+    WNNVNV,
+    PNNNVQNPPNVN,
+    NVVPNNN,
+    PNNPNNVQN,
+    NNNVQN,
+    WNVVEVNPN,
+    WNNNVNVP,
+    WNNVNVNPN,
+    NVNQNPWNNVNVP,
+    NVNNN,
+    WNNV,
+    NVQNPNNWNNV,
+    WNNVNVVN,
+    NVNPQN,
+    NVQNPNNN,
+    NVQN,*/
+
+    PNNNNVQNCQN,
+    WNNVNVP,
+    NNVQNCQN,
+    VNNVQNV,
+    NVQNCQNPNNN,
+    NVQNCNVQNPN,
+    PNPNNVQN,
+    WNVNVN,
+    WNNVNV,
+    PNNNVQNPPNVN,
+    NVVPNNN,
+    PNNPNNVQN,
+    NNNVQN,
+    WNVVEVNPN,
+    WNNNVNVP,
+    WNNVNVNPN,
+    NVNQNPWNNVNVP,
+    NVNNN,
+    WNNV,
+    NVQNPNNWNNV,
+    WNNVNVVN,
+    NVNPQN,
+    NVQNPNNN,
     NPNVQN,
     NVQNPVN,
     NVN,
@@ -124,20 +270,28 @@ public enum Gramlet {
     NVQNCQNPN,
     NVQNCQNPNN,
     NNVNQNCNNVNQN,
-    NVQNCQNPNNN,
-    NNVQNCQN,
-    WNNVNVP,
-    PNNNNVQNCQN,
+    CNVQNCQN,
+    P,
+    PN,
+    CNVQNP,
+    WVNVPNN,
+    NVPVNNCVN,
+    WNVN,
+    NVQNVV,
+    CNVQN,
+    CVVPNN,
+    NVPNNN,
+    WNNVPN,
+    CQNPVV,
     NVQNCQNN,
-    NVQNCNVQNPN,
-    VNNVQNV,
+    NVV,
     NVQN;
 
-    public static void addToLexicon(Map<String,
-            Integer> lexicon) {
 
-        for(Gramlet g: Gramlet.values()) {
-            lexicon.put(g.toString(), g.toString().hashCode());
+    public static void addToLexicon(Map<String, Integer> lexicon) {
+
+        for(FeatureGramlet featureGramlet: FeatureGramlet.values()) {
+            lexicon.put(featureGramlet.toString(), featureGramlet.toString().hashCode());
         }
 
         Set<String> allGramletChars = new HashSet<>();
@@ -155,17 +309,16 @@ public enum Gramlet {
     }
 
     static Set<String> unknownGramlets = new HashSet<>();
-    Map<Character,
-            Integer> counts;
-    Gramlet() {
+    Map<Character, Integer> counts;
+
+    FeatureGramlet() {
         counts = new HashMap<>();
         for(Character c: this.toString().toCharArray()) {
             int count = 1;
             if(counts.containsKey(c)) {
                 count += counts.get(c);
             }
-            counts.put(c,
-                    count);
+            counts.put(c, count);
         }
     }
 
@@ -174,8 +327,8 @@ public enum Gramlet {
     }
 
     public String lastChar() {
-        String gramletStirng = this.toString();
-        return gramletStirng.substring(gramletStirng.length() - 1);
+        String featureGramletString = this.toString();
+        return featureGramletString.substring(featureGramletString.length() - 1);
     }
 
     public int noOfVerbs() {
@@ -201,6 +354,7 @@ public enum Gramlet {
     public boolean hasWHAdverb() {
         return getCountOf('W') > 0;
     }
+
     public boolean containsPattern(String pattern) {
         return this.toString().contains(pattern);
     }
@@ -213,14 +367,14 @@ public enum Gramlet {
         return count;
     }
 
-    public static Gramlet valueOfGramlet(String gramletString) {
-        Gramlet gramlet = Gramlet.NVQN;
+    public static FeatureGramlet valueOfFeatureGramlet(String gramletString) {
+        FeatureGramlet featureGramlet = FeatureGramlet.NVQN;
         try {
-            gramlet = valueOf(gramletString);
+            featureGramlet = valueOf(gramletString);
         } catch (Exception e) {
             unknownGramlets.add(gramletString);
         }
-        return gramlet;
+        return featureGramlet;
     }
 
     public static void printUnknownGramlets() {

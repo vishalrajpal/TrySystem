@@ -59,7 +59,7 @@ public class EquationGenerator {
     public String getEquation() {
         // Use sentence splitter here and create multiple sentences in case of conj ands..
         //String updatedQuestionText = getConjAndSplitQuestion(questionText);
-        String updatedQuestionText = SentenceParser.parseQuestion(questionText);
+        String updatedQuestionText = SentenceParser.parseQuestionOnConjunction(questionText);
         DocumentPreprocessor dp = new DocumentPreprocessor(new StringReader(updatedQuestionText));
         //dp.setTokenizerFactory(lp.treebankLanguagePack().getTokenizerFactory());
 
@@ -115,7 +115,7 @@ public class EquationGenerator {
             newSentence.setNouns(sentenceNouns);
             newSentence.setDependencies(sentenceDependencies);
 
-            LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
+            //LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
 
             //LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
             LinkedHashSet<Verb> verbs = new LinkedHashSet<>();

@@ -129,7 +129,7 @@ public class MainClass {
                     newSentence.setNouns(sentenceNouns);
                     newSentence.setDependencies(sentenceDependencies);
 
-                    LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
+                    //LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
                     //LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
                     LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
                     verbs.addAll(SmartParser.parseVerbsBasedOnDependencies(sentenceDependencies));
@@ -232,7 +232,8 @@ public class MainClass {
         MainClass.initializeComponents();
         //MainClass.performPOSTagging("test.txt", "test_features.txt");
         MainClass.performPOSTagging("test_training_sentences.txt", "training_sentences_features.txt");
-        MainClass.performPOSTagging("test_testing_sentences.txt", "testing_sentences_features.txt");*/
+        MainClass.performPOSTagging("test_testing_sentences.txt", "testing_sentences_features.txt");
+        Gramlet.printUnknownGramlets();*/
         LogisticRegression.prepareLexicon();
 
         final String trainingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/training_sentences_features.txt").getPath();

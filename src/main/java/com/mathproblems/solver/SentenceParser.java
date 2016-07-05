@@ -23,9 +23,6 @@ import static com.mathproblems.solver.logisticregression.EquationGenerator.tagge
 
 public class SentenceParser {
 
-
-
-
     static {
         /*PennPOSTagsLists.initializeTagLists();
         SmartParser.initializeUniversalNouns();
@@ -38,7 +35,9 @@ public class SentenceParser {
         tagger = new MaxentTagger("models/english-left3words/english-left3words-distsim.tagger");*/
     }
 
-    public static String parseQuestion(String questionText) {
+    public static String parseQuestionOnConjunction(String questionText) {
+        questionText = parseQuestionOnCommas(questionText);
+
         StringReader sr  = new StringReader(questionText);
         StringBuilder sb = new StringBuilder();
         DocumentPreprocessor splitter = new DocumentPreprocessor(sr);
@@ -86,7 +85,7 @@ public class SentenceParser {
             newSentence.setNouns(sentenceNouns);
             newSentence.setDependencies(sentenceDependencies);
 
-            LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
+            //LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(newSentence, sentenceNouns);
 
             //LinkedHashSet<Verb> verbs = SmartParser.getVerbsFromTriplets(triplets);
             LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
@@ -189,6 +188,180 @@ public class SentenceParser {
                 sb.append(sentenceText);
             }
         }
+        return sb.toString();
+    }
+
+
+    public static String parseQuestionOnCommas(String questionText) {
+
+
+        StringBuilder sb = new StringBuilder();
+        StringReader sr  = new StringReader(questionText);
+        DocumentPreprocessor splitter = new DocumentPreprocessor(sr);
+        Question newQuestion = new Question(questionText);
+
+        for(List<HasWord> currentSentence: splitter) {
+            final String sentenceText = Sentence.listToString(currentSentence);
+
+            String[] splitByCommas = sentenceText.split(",");
+            if(splitByCommas.length ==1) {
+                sb.append(sentenceText);
+            } else {
+                String firstSentenceNoun = null;
+                String firstSentenceVerb = null;
+                String firstSentenceExpletive = null;
+                boolean hasFirstSentenceInitialized = false;
+                List<String> finalSentences = new ArrayList<>();
+                for(String individualSentence: splitByCommas) {
+                    StringReader srSub  = new StringReader(individualSentence + ". ");
+                    DocumentPreprocessor splitterSub = new DocumentPreprocessor(srSub);
+
+                    for(List<HasWord> individualSentenceList: splitterSub) {
+                        List<TaggedWord> tagged = tagger.tagSentence(individualSentenceList);
+                        final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
+
+                        final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
+
+                        System.out.println("------Parsing Nouns------");
+                        final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, individualSentence);
+                        System.out.println("------After Parsing Nouns------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+                        System.out.println("------Merging Compounds to Nouns------");
+                        sParser.mergeCompoundsOfParsedNouns(sentenceNouns);
+                        System.out.println("------After Merging Compound Nouns------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+                        System.out.println("------Merging Adjectives------");
+                        List<Adjective> adjectives = sParser.mergeAdjectivesOfParsedNouns(sentenceDependencies, sentenceNouns);
+                        System.out.println("------After Merging Adjectives------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+                        System.out.println("------Merging Nummods------");
+                        sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                        System.out.println("------After Merging Nummods------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+                        System.out.println("------Merging Nmods------");
+                        sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, individualSentence);
+                        System.out.println("------After Merging Nmods------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+                        System.out.println("------Merging Prepositions------");
+                        Collection<Preposition> prepositions = sParser.mergePrepositionsOfParsedNouns(sentenceDependencies, sentenceNouns);
+                        System.out.println("------After Merging Prepositions------");
+                        sParser.printProcessedNouns(sentenceNouns);
+
+
+                        final com.mathproblems.solver.facttuple.Sentence newSentence = new com.mathproblems.solver.facttuple.Sentence(individualSentence, newQuestion);
+                        newSentence.setNouns(sentenceNouns);
+                        newSentence.setDependencies(sentenceDependencies);
+
+                        LinkedHashSet<Verb> verbs = new LinkedHashSet<>();
+                        verbs.addAll(SmartParser.parseVerbsBasedOnDependencies(sentenceDependencies));
+
+                        LinkedHashSet<Expletive> expletives = SmartParser.parseExpletivesBasedOnDependencies(sentenceDependencies);
+
+                        LinkedHashSet<Conjunction> conjunctions = SmartParser.parserNounsWithConjAnds(sentenceDependencies);
+                        LinkedHashSet<WHAdverb> whAdverbs = SmartParser.parseWHAdverbsBasedOnDependencies(sentenceDependencies);
+                        SortedSet<PartsOfSpeech> nounsAndVerbs = new TreeSet<>(new Comparator<PartsOfSpeech>() {
+                            @Override
+                            public int compare(PartsOfSpeech o1, PartsOfSpeech o2) {
+                                if (o1.getDependentIndex() <= o2.getDependentIndex()) {
+                                    return -1;
+                                } else if (o1.getDependentIndex() > o2.getDependentIndex()) {
+                                    return 1;
+                                }
+                                return 0;
+                            }
+                        });
+                        nounsAndVerbs.addAll(sentenceNouns);
+                        nounsAndVerbs.addAll(verbs);
+                        nounsAndVerbs.addAll(prepositions);
+                        nounsAndVerbs.addAll(expletives);
+                        nounsAndVerbs.addAll(conjunctions);
+                        nounsAndVerbs.addAll(whAdverbs);
+
+                        LinkedHashMap<PartsOfSpeech, String> gramletToStringMapping = new LinkedHashMap<>();
+                        Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs, gramletToStringMapping);
+
+                        String sentenceGramlet = g.toString();
+
+                        LinkedList<String> firstSentenceList = new LinkedList<>();
+                        boolean toAddSentence = true;
+                        if(!hasFirstSentenceInitialized) {
+                            for (Map.Entry<PartsOfSpeech, String> entry : gramletToStringMapping.entrySet()) {
+
+                                String key = entry.getKey().getGramletCharacter();
+                                String value = entry.getValue();
+                                if (key.equals("QN")) {
+                                    firstSentenceList.add(value);
+                                }
+                                firstSentenceList.add(value);
+                            }
+
+                            if (sentenceGramlet.charAt(0) == 'E') {
+                                int expletiveIndex = sentenceGramlet.indexOf("E");
+                                int verbIndex = expletiveIndex + 1;
+                                firstSentenceExpletive = firstSentenceList.get(expletiveIndex);
+                                firstSentenceVerb = firstSentenceList.get(verbIndex);
+                                hasFirstSentenceInitialized = true;
+                            } else {
+                                int nounIndex = sentenceGramlet.indexOf("N");
+                                int verbIndex = sentenceGramlet.indexOf("V");
+
+                                firstSentenceNoun = firstSentenceList.get(nounIndex);
+                                firstSentenceVerb = firstSentenceList.get(verbIndex);
+                                hasFirstSentenceInitialized = true;
+                            }
+                        } else {
+
+                            if(sentenceGramlet.charAt(0) == 'C') {
+                                sentenceGramlet = sentenceGramlet.replaceFirst("C", "");
+                                StringBuilder withoutConj = new StringBuilder();
+                                for (Map.Entry<PartsOfSpeech, String> entry : gramletToStringMapping.entrySet()) {
+                                    if(entry.getKey().getGramletCharacter().equals("C") && entry.getKey().getDependentIndex() == 1) {
+                                        continue;
+                                    }
+                                    String key = entry.getKey().getGramletCharacter();
+                                    String value = entry.getValue();
+                                    withoutConj.append(value + " ");
+                                }
+                                individualSentence = withoutConj.toString();
+                            }
+
+                            if(firstSentenceExpletive != null && !sentenceGramlet.contains("E")){
+                                individualSentence = firstSentenceExpletive + " " + firstSentenceVerb + " " + individualSentence;
+                            } else if(sentenceGramlet.charAt(0) != 'P'){
+                                if(sentenceGramlet.charAt(0)=='Q') {
+                                    individualSentence = firstSentenceNoun + " " + firstSentenceVerb + " " + individualSentence;
+                                } else if(sentenceGramlet.charAt(0)=='V') {
+                                    individualSentence = firstSentenceNoun + " " + individualSentence;
+                                }
+                            } else if(sentenceGramlet.charAt(0)=='P') {
+                                List<String> newFinalSentences = new ArrayList<>();
+                                for(int i = 0; i<finalSentences.size(); i++) {
+                                    String current = finalSentences.get(i);
+                                    current = current + individualSentence;
+                                    newFinalSentences.add(current);
+                                }
+                                finalSentences = newFinalSentences;
+                                toAddSentence = false;
+                            }
+                        }
+                        //individualSentence += ". ";
+                        if(toAddSentence)
+                            finalSentences.add(individualSentence);
+                        //sb.append(individualSentence);
+                    }
+
+                }
+                for(String finalSentence: finalSentences) {
+                    sb.append(finalSentence + ".");
+                }
+            }
+        }
+
         return sb.toString();
     }
 
