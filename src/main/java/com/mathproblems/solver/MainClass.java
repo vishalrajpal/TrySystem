@@ -51,7 +51,7 @@ public class MainClass {
         operatorToNumberMap.put("=", 3);
         operatorToNumberMap.put("?", 4);*/
 
-      //  svmClassifier = new SVMClassifier();
+      //  svmClassifier = new SVM();
       //  svmClassifier.libSvmTrain("src/main/resources/verbs_training_output.txt");
     }
 
@@ -216,12 +216,12 @@ public class MainClass {
 
     public static void main(String[] args) {
         /**To produce wordnet and word2vec vectors for training verbs*/
-        //SVMClassifier.writeTrainingDataToFile("src/main/resources/verbs_testing.txt", true);
+        //SVM.writeTrainingDataToFile("src/main/resources/verbs_testing.txt", true);
 
         /** LibSVM training and evaluation*/
-        /*SVMClassifier svmClassifier = new SVMClassifier();
+        /*SVM svmClassifier = new SVM();
         svmClassifier.libSvmTrain("src/main/resources/verbs_training_output.txt");
-        svmClassifier.libSvmEvaluate("src/main/resources/verbs_testing_output.txt");
+        svmClassifier.test("src/main/resources/verbs_testing_output.txt");
         svmClassifier.libSVMClassify("has");*/
 
         /** Run ClausIE */
