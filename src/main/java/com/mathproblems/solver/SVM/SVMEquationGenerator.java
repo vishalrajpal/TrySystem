@@ -1,7 +1,9 @@
-package com.mathproblems.solver.logisticregression;
+package com.mathproblems.solver.SVM;
 
-import com.mathproblems.solver.*;
-import com.mathproblems.solver.equationtool.Triplet;
+import com.mathproblems.solver.PennPOSTagsLists;
+import com.mathproblems.solver.PennRelation;
+import com.mathproblems.solver.SentenceParser;
+import com.mathproblems.solver.SmartParser;
 import com.mathproblems.solver.facttuple.Question;
 import com.mathproblems.solver.partsofspeech.*;
 import edu.stanford.nlp.ling.HasWord;
@@ -17,7 +19,7 @@ import srl.mateplus.SRL;
 import java.io.StringReader;
 import java.util.*;
 
-public class EquationGenerator {
+public class SVMEquationGenerator {
 
     private static LexicalizedParser lp;
     private static TreebankLanguagePack tlp;
@@ -32,7 +34,7 @@ public class EquationGenerator {
         tagger = new MaxentTagger("models/english-left3words/english-left3words-distsim.tagger");
         //lp = LexicalizedParser.loadModel("models/englishPCFG.ser.gz");
         //lp.setOptionFlags(new String[] { "-maxLength", "80",
-          //      "-retainTmpSubcategories" });
+        //      "-retainTmpSubcategories" });
         tlp = new PennTreebankLanguagePack();
         gsf = tlp.grammaticalStructureFactory();
 
@@ -47,12 +49,14 @@ public class EquationGenerator {
     }
 
     private String questionText;
-    private List<LogisticRegression> allClassifiers;
+    private List<SVM> allClassifiers;
     private Question newQuestion;
-    public EquationGenerator(String questionText, List<LogisticRegression> allClassifiers) {
+    private SVM svm;
+    public SVMEquationGenerator(String questionText, List<SVM> allClassifiers, SVM singleClassifier) {
         this.questionText = questionText;
         this.allClassifiers = allClassifiers;
         this.newQuestion = new Question(questionText);
+        this.svm = singleClassifier;
         //getEquation();
     }
 
@@ -78,7 +82,7 @@ public class EquationGenerator {
             List<TaggedWord> tagged = tagger.tagSentence(sentenceWordList);
             final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
 
-            final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependenciesCCprocessed();
+            final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
 
             System.out.println("------Parsing Nouns------");
             final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, sentenceText);
@@ -95,14 +99,14 @@ public class EquationGenerator {
             System.out.println("------After Merging Adjectives------");
             sParser.printProcessedNouns(sentenceNouns);
 
-            System.out.println("------Merging Nmods------");
-            sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
-            System.out.println("------After Merging Nmods------");
-            sParser.printProcessedNouns(sentenceNouns);
-
             System.out.println("------Merging Nummods------");
             sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
             System.out.println("------After Merging Nummods------");
+            sParser.printProcessedNouns(sentenceNouns);
+
+            System.out.println("------Merging Nmods------");
+            sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
+            System.out.println("------After Merging Nmods------");
             sParser.printProcessedNouns(sentenceNouns);
 
             System.out.println("------Merging Prepositions------");
@@ -146,14 +150,12 @@ public class EquationGenerator {
             Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs, null);
             String featureString = sParser.extractFeatures(g, sentenceText, -1, verbs, sentenceDependencies);
             Map<Integer, Double> classToLabel = new HashMap<>();
-            LogisticRegression best =  LogisticRegression.predictSingleSentence(featureString, allClassifiers, classToLabel);
+            int predictedLabel =  (int)SVM.predictSingleSentenceSVM(featureString, svm, classToLabel);
 
-            int predictedLabel = best.getTargetClass();
-            if(g.noOfQuantities() != 0 && (predictedLabel==3 || predictedLabel==4)) {
+            //int predictedLabel = best.getTargetClass();
+            /*if(g.noOfQuantities() != 0 && (predictedLabel==3 || predictedLabel==4)) {
                 predictedLabel = classToLabel.get(1) > classToLabel.get(2) ? 1 : 2;
-            } else if(g.noOfQuantities() == 0 && (predictedLabel==1 || predictedLabel==2)) {
-                predictedLabel = classToLabel.get(3) > classToLabel.get(4) ? 3 : 4;
-            }
+            }*/
 
             if(predictedLabel == 3) {
                 equationBuilder.append(" X");
@@ -161,7 +163,7 @@ public class EquationGenerator {
                 if(adjectives.size() > 0) {
                     for(Noun n: sentenceNouns) {
                         if(n.getRelation().equals(PennRelation.dobj) || n.getRelation().equals(PennRelation.nsubj) || n.getRelation().equals(PennRelation.nsubjpass)) {
-                            nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                            nounToPredictedLabel.put(n, SVM.numberToOperatorMap.get(predictedLabel));
                             break;
                         }
                     }
@@ -172,10 +174,10 @@ public class EquationGenerator {
             } else {
                 for (Noun n : sentenceNouns) {
                     if (n.getQuantity() != 0) {
-                        nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                        nounToPredictedLabel.put(n, SVM.numberToOperatorMap.get(predictedLabel));
                         int sign = 1;
-                        equationBuilder.append(LogisticRegression.numberToOperatorMap.get(predictedLabel) + n.toSmartString() + " ");
-                        if(LogisticRegression.numberToOperatorMap.get(predictedLabel).equals("-")) {
+                        equationBuilder.append(SVM.numberToOperatorMap.get(predictedLabel) + n.toSmartString() + " ");
+                        if(SVM.numberToOperatorMap.get(predictedLabel).equals("-")) {
                             sign = -sign;
                         }
                         result = result + (sign * n.getQuantity());
@@ -220,70 +222,4 @@ public class EquationGenerator {
             }
         }
     }
-
-    private String getConjAndSplitQuestion(String questionText) {
-        StringReader sr  = new StringReader(questionText);
-        StringBuilder sb = new StringBuilder();
-        DocumentPreprocessor splitter = new DocumentPreprocessor(sr);
-
-        for(List<HasWord> currentSentence: splitter) {
-
-            String currentSentenceString = Sentence.listToOriginalTextString(currentSentence);
-            String[] split = currentSentenceString.split("(\\band\\b)+");
-            if(split.length == 2) {
-                String firstSentence = split[0] + ".";
-                sb.append(firstSentence);
-                com.mathproblems.solver.facttuple.Sentence s = new com.mathproblems.solver.facttuple.Sentence(firstSentence, null);
-
-                StringReader firstSentenceReader = new StringReader(firstSentence);
-                DocumentPreprocessor firstSentenceList = new DocumentPreprocessor(firstSentenceReader);
-                //final Tree sentenceTree = lp.parseTree(firstSentenceList.iterator().next());
-                //final GrammaticalStructure grammaticalStructure = gsf.newGrammaticalStructure(sentenceTree);
-                List<TaggedWord> tagged = tagger.tagSentence(firstSentenceList.iterator().next());
-                final GrammaticalStructure grammaticalStructure = parser.predict(tagged);
-                final Collection<TypedDependency> sentenceDependencies = grammaticalStructure.typedDependencies();
-
-                System.out.println("------Parsing Nouns------");
-                final LinkedHashSet<Noun> sentenceNouns = sParser.parseNounsAccordingToUniversalDependencyTags(sentenceDependencies, firstSentence);
-                System.out.println("------After Parsing Nouns------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                System.out.println("------Merging Compounds to Nouns------");
-                sParser.mergeCompoundsOfParsedNouns(sentenceNouns);
-                System.out.println("------After Merging Compound Nouns------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                System.out.println("------Merging Adjectives------");
-                sParser.mergeAdjectivesOfParsedNouns(sentenceDependencies, sentenceNouns);
-                System.out.println("------After Merging Adjectives------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                System.out.println("------Merging Nummods------");
-                sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
-                System.out.println("------After Merging Nummods------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                System.out.println("------Merging Nmods------");
-                sParser.mergeNmodsWithParsedNouns(sentenceDependencies, sentenceNouns, currentSentenceString);
-                System.out.println("------After Merging Nmods------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                System.out.println("------Merging Prepositions------");
-                Collection<Preposition> prepositions = sParser.mergePrepositionsOfParsedNouns(sentenceDependencies, sentenceNouns);
-                System.out.println("------After Merging Prepositions------");
-                sParser.printProcessedNouns(sentenceNouns);
-
-                LinkedHashSet<Triplet> triplets = SmartParser.getTriplets(s, sentenceNouns);
-
-                for(Triplet t: triplets) {
-                    String secondSentence = t.getSubject() + " " + t.getVerb() + split[1] + ".";
-                    sb.append(secondSentence);
-                }
-            } else {
-                sb.append(currentSentenceString);
-            }
-        }
-        return sb.toString();
-    }
-
 }

@@ -40,6 +40,7 @@ public class SmartParser {
 		universalNounsList.add(PennRelation.parataxis);
 		universalNounsList.add(PennRelation.ccomp);
 		universalNounsList.add(PennRelation.advcl);
+		universalNounsList.add(PennRelation.advmod);
 	}
 	
 	public static void initializeUniversalAdjectives() {
@@ -66,7 +67,7 @@ public class SmartParser {
                     && PennPOSTagsLists.isANoun(dependency.dep().tag())
                     && !dependentIndices.contains(dependency.dep().index())) {
 				//System.out.println(dependency.toString() + " : " + dependency.dep().toString());
-				final Noun n = new Noun(dependency, sentenceText);
+				final Noun n = new Noun(dependency, sentenceText, dependencies);
 				//System.out.println(n.getDependent());
 				nounList.add(n);
                 dependentIndices.add(n.getDependentIndex());
@@ -109,6 +110,12 @@ public class SmartParser {
 		}
 		return adjectiveList;
 	}
+
+	/*public void mergeOtherNouns(Collection<Noun> nouns, Collection<TypedDependency> dependencies) {
+		for(TypedDependency dependency: dependencies) {
+			if(PennRelation.valueOfPennRelation(dependency.reln().getShortName()).equals(PennRelation.advmod) && )
+		}
+	}*/
 	
 	/*public List<Verb> parseVerbsAccordingToUniversalDependencyTags(List<TypedDependency> dependencies) {
 		String currentRelation;
@@ -250,9 +257,10 @@ public class SmartParser {
 			if(!n.getRelation().equals(PennRelation.compound)) {
 				final Collection<Noun> remove = n.mergeAllCompounds(nounList);
                 toRemove.addAll(remove);
-			} else {
-				n.mergeGovernerIndex();
 			}
+			/*else {
+				n.mergeGovernerIndex();
+			}*/
 		}
         nounList.removeAll(toRemove);
 	}
@@ -292,7 +300,8 @@ public class SmartParser {
 		String currentRelation;
 		for(TypedDependency dependency: dependencies) {
 			currentRelation = dependency.reln().toString();
-			if(PennRelation.valueOfPennRelation(currentRelation).equals(PennRelation.nmod)) {
+			PennRelation rel = PennRelation.valueOfPennRelation(currentRelation);
+			if(rel.equals(PennRelation.nmod) || rel.equals(PennRelation.nmodof) || rel.equals(PennRelation.nmodposs) || rel.equals(PennRelation.nmodin)) {
 				String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 				String gov = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 				System.out.println(dependency.toString() + " : " + dep + ":" + gov);
@@ -304,27 +313,44 @@ public class SmartParser {
 
 	public void mergeNmodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList, String sentenceText) {
 		List<TypedDependency> nMods = getAllNmods(dependencies);
-		//String dependent;
+		String dependent;
 		String governer;
 		boolean foundMatch;
 		for(TypedDependency dependency: nMods) {
 			//dependent = dependency.dep().originalText();
 			//governer = dependency.gov().originalText();
+			String currentRelation = dependency.reln().toString();
+			PennRelation rel = PennRelation.valueOfPennRelation(currentRelation);
+
 			foundMatch = false;
 			governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
-			for(Noun n: nounList) {
-				if(governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
-					foundMatch = true;
-					PartsOfSpeech nMod = new Noun(dependency, n.getSentenceText());
-					n.mergeAdjective(nMod);
-					//n.associateQuantity(dependency.dep().originalText());
-					//n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
-					n.associateIndex(governer, dependency.gov().index());
+			dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			if(rel.equals(PennRelation.nmodof)) {
+				for (Noun n : nounList) {
+					if (governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
+						foundMatch = true;
+						//PartsOfSpeech nMod = new Noun(dependency, n.getSentenceText(), dependencies);
+						//n.mergeAdjective(nMod);
+						n.setDependent(dependent);
+						//n.associateQuantity(dependency.dep().originalText());
+						//n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
+						n.associateIndex(dependent, dependency.gov().index());
+					}
+				}
+			} else if(!rel.equals(PennRelation.nmodin)){
+				for (Noun n : nounList) {
+					if (governer.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
+						foundMatch = true;
+						PartsOfSpeech nMod = new Noun(dependency, n.getSentenceText(), dependencies);
+						n.mergeAdjective(nMod);
+						//n.associateQuantity(dependency.dep().originalText());
+						//n.associateIndex(dependency.gov().originalText(), dependency.gov().index());
+						n.associateIndex(governer, dependency.gov().index());
+					}
 				}
 			}
-
 			if(!foundMatch) {
-				nounList.add(new Noun(dependency, sentenceText));
+				nounList.add(new Noun(dependency, sentenceText, dependencies));
 			}
 		}
 	}
@@ -382,9 +408,10 @@ public class SmartParser {
         }
     }
 
-	public String extractFeatures(Gramlet gramlet, String sentence, int label, LinkedHashSet<Verb> verbs) {
+	public String extractFeatures(Gramlet gramlet, String sentence, int label, LinkedHashSet<Verb> verbs, Collection<TypedDependency> dependencies) {
 		final String ifWord = "if";
 		final String onlyWord = "only";
+		final String toWord = "to";
 
 		char splitChar = ' ';
 		char concatChar = ':';
@@ -410,6 +437,20 @@ public class SmartParser {
 		featureVector.put(LogisticRegression.CONTAINS_WORD_ONLY_STRING.hashCode(), sentence.toLowerCase().contains(onlyWord) ? 1.0 : 0.0);
 		featureVector.put(LogisticRegression.HAS_ZERO_QUANTITIES_STRING.hashCode(), gramlet.noOfQuantities() == 0 ? 1.0 : 0.0);
 		featureVector.put(LogisticRegression.HAS_WHADVERB_STRING.hashCode(), gramlet.hasWHAdverb() ? 1.0 : 0.0);
+		featureVector.put(LogisticRegression.CONTAINS_WORD_TO_STRING.hashCode(), sentence.toLowerCase().contains(toWord) ? 1.0 : 0.0);
+
+		featureVector.put(LogisticRegression.CONTAINS_NMOD_OF.hashCode(), 0.0);
+		featureVector.put(LogisticRegression.CONTAINS_NMOD_POSS.hashCode(), 0.0);
+		Collection<TypedDependency> nMods = getAllNmods(dependencies);
+		for(TypedDependency dependency: nMods) {
+			PennRelation currentRelation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());
+			if(currentRelation.equals(PennRelation.nmodof)) {
+				featureVector.put(LogisticRegression.CONTAINS_NMOD_OF.hashCode(), 1.0);
+			} else if(currentRelation.equals(PennRelation.nmodposs)) {
+				featureVector.put(LogisticRegression.CONTAINS_NMOD_POSS.hashCode(), 1.0);
+			}
+		}
+
 
 		Pattern p = Pattern.compile("(some|most|several)");
 		Matcher m = p.matcher(sentence.toLowerCase());
@@ -723,6 +764,7 @@ public class SmartParser {
 
 	public static LinkedHashSet<Verb> parseVerbsBasedOnDependencies(Collection<TypedDependency> dependencies) {
 		LinkedHashSet<Verb> dependencyVerbs = new LinkedHashSet<>();
+		Collection<TypedDependency> auxiliaryVerbs = new ArrayList<>();
 		for(TypedDependency dependency: dependencies) {
 			String depTag = dependency.dep().tag();
 			String govTag = dependency.gov().tag();
@@ -734,6 +776,19 @@ public class SmartParser {
 				String verb = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 				Verb newVerb = new Verb(dependency.gov().index(), verb, false);
 				dependencyVerbs.add(newVerb);
+			}
+
+			if(PennRelation.valueOfPennRelation(dependency.reln().getShortName()).equals(PennRelation.aux)) {
+				auxiliaryVerbs.add(dependency);
+			}
+		}
+
+		for(TypedDependency dependency: auxiliaryVerbs) {
+			int govIndex = dependency.gov().index();
+			for (Verb dependencyVerb : dependencyVerbs) {
+				if(govIndex == dependencyVerb.getIndex()) {
+					dependencyVerb.mergeAuxiliaryVerb(dependency);
+				}
 			}
 		}
 		return dependencyVerbs;
@@ -795,5 +850,70 @@ public class SmartParser {
 			return false;
 		}
 		return true;
+	}
+
+	public Collection<TypedDependency> getConjunctionDependencies(Collection<TypedDependency> dependencies) {
+		Collection<TypedDependency> conjAndDependencies = new LinkedHashSet<>();
+		for(TypedDependency dependency : dependencies) {
+			if (PennRelation.valueOfPennRelation(dependency.reln().toString()).equals(PennRelation.conj)) {
+				String governerText  = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				String dependentText = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+				if (!governerText.equals(dependentText)) {
+					conjAndDependencies.add(dependency);
+				}
+			}
+		}
+		return conjAndDependencies;
+	}
+
+	public List<String> getParsedConjAndNoouns(Collection<TypedDependency> dependencies) {
+
+		List<String> conjAndStrings = new ArrayList<>();
+		TypedDependency conjAndDependency = null;
+		for(TypedDependency dependency : dependencies) {
+			if(PennRelation.valueOfPennRelation(dependency.reln().getShortName()).equals(PennRelation.conj)) {
+				conjAndDependency = dependency;
+				break;
+			}
+		}
+
+		if(conjAndDependency != null) {
+			boolean firstQuantityFound = false;
+			boolean secondQuantityFound = false;
+			String governerText  = conjAndDependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			String dependentText = conjAndDependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			String firstDependency =  governerText + " " + dependentText;
+			String secondDependency = dependentText;
+			int governerIndex = conjAndDependency.gov().index();
+
+			for(TypedDependency dependency: dependencies) {
+				PennRelation currentRelation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());
+				if(currentRelation.equals(PennRelation.nummod)
+						&& dependency.gov().index() == governerIndex) {
+					String firstDepText = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+					firstDependency = firstDepText + " " + firstDependency;
+					firstQuantityFound = true;
+				} else if(currentRelation.equals(PennRelation.amod) && dependency.gov().index() == conjAndDependency.dep().index()) {
+					String firstDepText = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+					secondDependency = firstDepText + " " + secondDependency;
+
+					for(TypedDependency nModSecondDependency: dependencies) {
+						PennRelation secondDepNmodReln = PennRelation.valueOfPennRelation(nModSecondDependency.reln().getShortName());
+						if(secondDepNmodReln.equals(PennRelation.nummod)
+								&& nModSecondDependency.gov().index() == conjAndDependency.dep().index()) {
+							String nModSecondDepText =nModSecondDependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+							secondDependency = nModSecondDepText + " " + secondDependency;
+							secondQuantityFound = true;
+						}
+					}
+				}
+			}
+
+			if(firstQuantityFound && secondQuantityFound) {
+				conjAndStrings.add(firstDependency + " ");
+				conjAndStrings.add(secondDependency + " ");
+			}
+		}
+		return conjAndStrings;
 	}
 }

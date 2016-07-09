@@ -1,17 +1,19 @@
 package com.mathproblems.solver.partsofspeech;
 
 import com.mathproblems.solver.PennPOSTags;
+import edu.stanford.nlp.trees.TypedDependency;
 
 public class Verb implements PartsOfSpeech {
 	private final int index;
-	private final String verb;
+	private String verb;
 	private final boolean isConjAndVerb;
-
+	private String mergedVerbs;
 	public Verb(final int index,
 				final String verb,
 				boolean isConjAndTriplet) {
 		this.index = index;
 		this.verb = verb;
+		this.mergedVerbs = verb;
 		this.isConjAndVerb = isConjAndTriplet;
 	}
 
@@ -22,6 +24,8 @@ public class Verb implements PartsOfSpeech {
 	public String getVerb() {
 		return verb;
 	}
+
+
 
 	@Override
 	public PennPOSTags getTag() {
@@ -90,6 +94,15 @@ public class Verb implements PartsOfSpeech {
 	}
 
 	public String getDependentWithQuantity() {
-		return getDependent();
+		return getMergedVerbs();
+	}
+
+	public void mergeAuxiliaryVerb(TypedDependency dependency) {
+		String auxVerb = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+		this.mergedVerbs = auxVerb + " " + this.mergedVerbs;
+	}
+
+	public String getMergedVerbs() {
+		return mergedVerbs;
 	}
 }

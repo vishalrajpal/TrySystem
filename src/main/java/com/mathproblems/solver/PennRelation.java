@@ -28,6 +28,7 @@ public enum PennRelation {
 	nmod,
 	nmodof,
 	nmodposs,
+	nmodin,
 	dobj,
 	iobj,
 	root,
@@ -66,6 +67,9 @@ public enum PennRelation {
 							break;
 						case "poss":
 							str="nmodposs";
+							break;
+						case "in":
+							str="nmodin";
 							break;
 					}
 				}

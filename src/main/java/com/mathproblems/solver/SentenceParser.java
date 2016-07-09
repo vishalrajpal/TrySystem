@@ -118,6 +118,11 @@ public class SentenceParser {
 
             if(g.noOfCounjunctions() == 1) {
 
+                List<String> conjAndStrings = sParser.getParsedConjAndNoouns(sentenceDependencies);
+                boolean toAppend = true;
+                if(conjAndStrings.size() == 2) {
+                    toAppend = false;
+                }
                 StringBuilder firstSentence = new StringBuilder();
                 StringBuilder secondSentence = new StringBuilder();
                 StringBuilder sentence1Gramlet = new StringBuilder();
@@ -135,14 +140,18 @@ public class SentenceParser {
                         isFirstSentenceOver = true;
                         continue;
                     } else if(!isFirstSentenceOver) {
-                        firstSentence.append(value + " ");
+                        if(toAppend) {
+                            firstSentence.append(value + " ");
+                        }
                         sentence1Gramlet.append(key);
                         if(key.equals("QN")) {
                             firstSentenceList.add(value);
                         }
                         firstSentenceList.add(value);
                     } else {
-                        secondSentence.append(value + " ");
+                        if(toAppend) {
+                            secondSentence.append(value + " ");
+                        }
                         sentence2Gramlet.append(key);
                         if(key.equals("QN")) {
                             secondSentenceList.add(value);
@@ -155,12 +164,24 @@ public class SentenceParser {
                     int expletiveIndex = sentence1Gramlet.indexOf("E");
                     int verbIndex = expletiveIndex + 1;
                     //sentence2Gramlet.insert(0, "EV");
+
+                    if(!toAppend) {
+                        firstSentence.insert(0, firstSentenceList.get(verbIndex) + " ");
+                        firstSentence.insert(0, firstSentenceList.get(expletiveIndex) + " ");
+                    }
+
                     secondSentence.insert(0, firstSentenceList.get(verbIndex) + " ");
                     secondSentence.insert(0, firstSentenceList.get(expletiveIndex) + " ");
+
+
                 } else {
                     int nounIndex = sentence1Gramlet.indexOf("N");
                     int verbIndex = sentence1Gramlet.indexOf("V");
 
+                    if(!toAppend) {
+                        firstSentence.insert(0, firstSentenceList.get(verbIndex) + " ");
+                        firstSentence.insert(0, firstSentenceList.get(nounIndex) + " ");
+                    }
                     if(sentence2Gramlet.charAt(0)=='Q') {
                         //sentence2Gramlet.insert(0, "NV");
                         secondSentence.insert(0, firstSentenceList.get(verbIndex) + " ");
@@ -168,6 +189,11 @@ public class SentenceParser {
                     } else if(sentence2Gramlet.charAt(0)=='V') {
                         secondSentence.insert(0, firstSentenceList.get(nounIndex) + " ");
                     }
+                }
+
+                if(!toAppend) {
+                    firstSentence.append(conjAndStrings.get(0));
+                    secondSentence.append(conjAndStrings.get(1));
                 }
 
                 if(sentence2Gramlet.indexOf("P") != -1 && sentence1Gramlet.indexOf("P") == -1) {
@@ -181,6 +207,10 @@ public class SentenceParser {
                         sentence1Gramlet.append(g.toString().charAt(i));
                     }
                 }
+
+
+
+
                 sb.append(firstSentence+ ". ");
                 sb.append(secondSentence+ ". ");
 

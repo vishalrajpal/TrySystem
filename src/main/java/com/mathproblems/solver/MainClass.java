@@ -157,7 +157,7 @@ public class MainClass {
                     nounsAndVerbs.addAll(conjunctions);
 
                     Gramlet g = SmartParser.parsePOSToGramlet(nounsAndVerbs, null);
-                    String featureString = sParser.extractFeatures(g, sentenceText, label, verbs);
+                    String featureString = sParser.extractFeatures(g, sentenceText, label, verbs, sentenceDependencies);
                     bWriter.write(featureString + "\n");
                     System.out.println(featureString);
                     //linkSRLAndPOS(newSentence, newQuestion, tripletToEquationMap, equationTrees);
@@ -239,10 +239,10 @@ public class MainClass {
         final String trainingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/training_sentences_features.txt").getPath();
         final String testingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/testing_sentences_features.txt").getPath();
         LogisticRegression lr1 = new LogisticRegression(12, 1, 0.0001, -1.5, 100, 1);
-        lr1.train(trainingFilePath, testingFilePath, 10);
+        lr1.train(trainingFilePath, testingFilePath, 11);
 
         LogisticRegression lr2 = new LogisticRegression(12, 2, 0.0005, -1.0, 200, 1);
-        lr2.train(trainingFilePath, testingFilePath, 14);
+        lr2.train(trainingFilePath, testingFilePath, 13);
 
         LogisticRegression lr3 = new LogisticRegression(12, 3, 0.01, 0.0, 200, 1);
         lr3.train(trainingFilePath, testingFilePath, 7);
@@ -264,6 +264,8 @@ public class MainClass {
             String question = testQuestionScaner.nextLine();
             EquationGenerator eq1 = new EquationGenerator(question, allClassifiers);
             System.out.println(eq1.getEquation());
+            Gramlet.printUnknownGramlets();
+            System.out.println();
         }
 
 

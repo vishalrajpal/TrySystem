@@ -9,32 +9,40 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Noun implements PartsOfSpeech {
 
-	private final String dependent;
+	private String dependent;
 	private final PennPOSTags nounType;
 	private final PennRelation relation;
 	private final TypedDependency dependency;
 	private final int dependentIndex;
-	private final int governerIndex;
+	private int governerIndex;
 	private final SortedSet<PartsOfSpeech> mergedCompounds;
-	private final String governer;
+	private String governer;
 	private double quantity;
 	private final Map<String, Integer> relatedNouns;
 	private final LinkedHashSet<Preposition> prepositions;
 	private final SortedSet<Integer> indices;
 	private StringBuilder suffixString;
 	private String sentenceText;
-	public Noun (TypedDependency dependency, String sentenceText) {
+	public Noun (TypedDependency dependency, String sentenceText, Collection<TypedDependency> dependencies) {
 		this.dependency = dependency;
 		this.sentenceText=sentenceText;
-		governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
-		dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
-		//governer = dependency.gov().originalText();
-		//dependent = dependency.dep().originalText();
-
 		relation = PennRelation.valueOfPennRelation(dependency.reln().getShortName());
+
+		governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+		governerIndex = dependency.gov().index();
+		/*if(!governerExistsInNMod(dependencies)) {
+			governer = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			governerIndex = dependency.gov().index();
+		} else {
+			governer = "";
+			governerIndex = -1;
+		}*/
+		dependent = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+
+
+
 		nounType = PennPOSTags.valueOf(dependency.dep().tag());
 		dependentIndex = dependency.dep().index();
-		governerIndex = dependency.gov().index();
 		mergedCompounds = new TreeSet<PartsOfSpeech>(new Comparator<PartsOfSpeech>() {
 			public int compare(PartsOfSpeech o1, PartsOfSpeech o2) {
 				return o1.getDependentIndex() - o2.getDependentIndex();
@@ -48,11 +56,21 @@ public class Noun implements PartsOfSpeech {
 		suffixString = new StringBuilder();
 		prepositions = new LinkedHashSet<>();
 
+
 		if(nounType.equals(PennPOSTags.CD) && isANumber(dependent)) {
 			associateQuantity(dependent);
 		} else {
 			mergedCompounds.add(this);
 		}
+	}
+
+	private boolean governerExistsInNMod(Collection<TypedDependency> dependencies) {
+		for(TypedDependency dependency: dependencies) {
+			if(PennRelation.valueOfPennRelation(dependency.reln().getShortName()).equals(PennRelation.nmod) && dependency.gov().index()==this.dependency.gov().index()) {
+				return true;
+			}
+		}
+		return false;
 	}
 //Jason found 49 seashells on the beach . He gave 13 of the seashells to Tim . How many seashells does Jason now have ?
 	private boolean isANumber(String str) {
@@ -261,10 +279,18 @@ public class Noun implements PartsOfSpeech {
 	}
 
 	public String getDependentWithQuantity() {
-		/*String depWithQuantity = "";
-		if(getQuantity() != 0) {
-			depWithQuantity = getQuantity() + " ";
-		}*/
-		return toSmartString();
+		String initialString = "";
+		if(this.quantity!= 0) {
+			initialString = this.quantity + " ";
+		}
+		StringBuilder sb = new StringBuilder(initialString);
+		for(PartsOfSpeech pos: mergedCompounds) {
+			sb.append(pos.getDependent() + " ");
+		}
+		return sb.toString();
+	}
+
+	public void setDependent(String dependent) {
+		this.dependent = dependent;
 	}
 }

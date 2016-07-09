@@ -97,6 +97,9 @@ public class LogisticRegression {
     public static final String IS_QUANTITY_AFTER_VERB_STRING = "isQuantityAfterVerb";
     public static final String HAS_ZERO_QUANTITIES_STRING = "hasZeroQuantities";
     public static final String HAS_WHADVERB_STRING = "hasWhAdverb";
+    public static final String CONTAINS_WORD_TO_STRING = "containsWordTo";
+    public static final String CONTAINS_NMOD_OF = "containsNmodOf";
+    public static final String CONTAINS_NMOD_POSS = "containsNmodPoss";
 
     public static Map<String, Integer> operatorToNumberMap = new HashMap<>();
     public static Map<Integer, String> numberToOperatorMap = new HashMap<>();
@@ -118,6 +121,9 @@ public class LogisticRegression {
         otherFeatureNames.add(IS_QUANTITY_AFTER_VERB_STRING);
         otherFeatureNames.add(HAS_ZERO_QUANTITIES_STRING);
         otherFeatureNames.add(HAS_WHADVERB_STRING);
+        otherFeatureNames.add(CONTAINS_WORD_TO_STRING);
+        otherFeatureNames.add(CONTAINS_NMOD_OF);
+        otherFeatureNames.add(CONTAINS_NMOD_POSS);
 
         for(String str: otherFeatureNames) {
             lexiconDictionary.put(str, str.hashCode());
