@@ -29,6 +29,7 @@ public enum PennPOSTags {
 	$,
 	EX,
 	PREP,
+	RBR,
 	TO;
 
 	public static PennPOSTags valueOfNullable(String value) {

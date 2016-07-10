@@ -112,7 +112,7 @@ public class MainClass {
                     sParser.printProcessedNouns(sentenceNouns);
 
                     System.out.println("------Merging Nummods------");
-                    sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                    sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
                     System.out.println("------After Merging Nummods------");
                     sParser.printProcessedNouns(sentenceNouns);
 
@@ -239,16 +239,16 @@ public class MainClass {
         final String trainingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/training_sentences_features.txt").getPath();
         final String testingFilePath = Thread.currentThread().getContextClassLoader().getResource("training/testing_sentences_features.txt").getPath();
         LogisticRegression lr1 = new LogisticRegression(12, 1, 0.0001, -1.5, 100, 1);
-        lr1.train(trainingFilePath, testingFilePath, 11);
+        lr1.train(trainingFilePath, testingFilePath, 9);
 
         LogisticRegression lr2 = new LogisticRegression(12, 2, 0.0005, -1.0, 200, 1);
-        lr2.train(trainingFilePath, testingFilePath, 13);
+        lr2.train(trainingFilePath, testingFilePath, 14);
 
         LogisticRegression lr3 = new LogisticRegression(12, 3, 0.01, 0.0, 200, 1);
-        lr3.train(trainingFilePath, testingFilePath, 7);
+        lr3.train(trainingFilePath, testingFilePath, 2);
 
         LogisticRegression lr4 = new LogisticRegression(12, 4, 0.001, 0.0, 200, 1);
-        lr4.train(trainingFilePath, testingFilePath, 3);
+        lr4.train(trainingFilePath, testingFilePath, 4);
 
         List<LogisticRegression> allClassifiers = new ArrayList<>();
         allClassifiers.add(lr1);

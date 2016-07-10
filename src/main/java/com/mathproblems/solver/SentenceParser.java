@@ -66,7 +66,7 @@ public class SentenceParser {
             sParser.printProcessedNouns(sentenceNouns);
 
             System.out.println("------Merging Nummods------");
-            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
             System.out.println("------After Merging Nummods------");
             sParser.printProcessedNouns(sentenceNouns);
 
@@ -131,6 +131,7 @@ public class SentenceParser {
                 LinkedList<String> secondSentenceList = new LinkedList<>();
                 boolean isFirstSentenceOver = false;
 
+                PartsOfSpeech firstNoun = null;
                 for(Map.Entry<PartsOfSpeech, String> entry: gramletToStringMapping.entrySet()) {
 
                     String key = entry.getKey().getGramletCharacter();
@@ -146,6 +147,7 @@ public class SentenceParser {
                         sentence1Gramlet.append(key);
                         if(key.equals("QN")) {
                             firstSentenceList.add(value);
+                            firstNoun = entry.getKey();
                         }
                         firstSentenceList.add(value);
                     } else {
@@ -155,6 +157,11 @@ public class SentenceParser {
                         sentence2Gramlet.append(key);
                         if(key.equals("QN")) {
                             secondSentenceList.add(value);
+
+                            if(entry.getKey().getTag().equals(PennPOSTags.CD) && entry.getKey().getIndices().size() == 1 && firstNoun != null) {
+                                ((Noun)(entry.getKey())).associateIndex(firstNoun.getDependent(), firstNoun.getDependentIndex());
+                                secondSentence.append(firstNoun.getDependent() + " ");
+                            }
                         }
                         secondSentenceList.add(value);
                     }
@@ -268,7 +275,7 @@ public class SentenceParser {
                         sParser.printProcessedNouns(sentenceNouns);
 
                         System.out.println("------Merging Nummods------");
-                        sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                        sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, individualSentence);
                         System.out.println("------After Merging Nummods------");
                         sParser.printProcessedNouns(sentenceNouns);
 
@@ -339,10 +346,11 @@ public class SentenceParser {
                             } else {
                                 int nounIndex = sentenceGramlet.indexOf("N");
                                 int verbIndex = sentenceGramlet.indexOf("V");
-
-                                firstSentenceNoun = firstSentenceList.get(nounIndex);
-                                firstSentenceVerb = firstSentenceList.get(verbIndex);
-                                hasFirstSentenceInitialized = true;
+                                if(nounIndex != -1) {
+                                    firstSentenceNoun = firstSentenceList.get(nounIndex);
+                                    firstSentenceVerb = firstSentenceList.get(verbIndex);
+                                    hasFirstSentenceInitialized = true;
+                                }
                             }
                         } else {
 

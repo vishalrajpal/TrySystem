@@ -3,6 +3,9 @@ package com.mathproblems.solver.partsofspeech;
 import com.mathproblems.solver.PennPOSTags;
 import edu.stanford.nlp.trees.TypedDependency;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Verb implements PartsOfSpeech {
 	private final int index;
 	private String verb;
@@ -104,5 +107,9 @@ public class Verb implements PartsOfSpeech {
 
 	public String getMergedVerbs() {
 		return mergedVerbs;
+	}
+
+	public Set<Integer> getIndices() {
+		return new HashSet<>();
 	}
 }

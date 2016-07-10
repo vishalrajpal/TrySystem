@@ -100,7 +100,7 @@ public class SVMEquationGenerator {
             sParser.printProcessedNouns(sentenceNouns);
 
             System.out.println("------Merging Nummods------");
-            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
             System.out.println("------After Merging Nummods------");
             sParser.printProcessedNouns(sentenceNouns);
 

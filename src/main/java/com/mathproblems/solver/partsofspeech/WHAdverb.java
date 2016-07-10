@@ -2,6 +2,9 @@ package com.mathproblems.solver.partsofspeech;
 
 import com.mathproblems.solver.PennPOSTags;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class WHAdverb implements PartsOfSpeech {
 
     private int index;
@@ -51,5 +54,9 @@ public class WHAdverb implements PartsOfSpeech {
 
     public String getDependentWithQuantity() {
         return getDependent();
+    }
+
+    public Set<Integer> getIndices() {
+        return new HashSet<>();
     }
 }

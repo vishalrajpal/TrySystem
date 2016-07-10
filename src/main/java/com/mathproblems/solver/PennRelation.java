@@ -42,6 +42,7 @@ public enum PennRelation {
 	advcl,
 	punct,
 	csubj,
+	ref,
 	csubjpass;
 	
 	public static PennRelation valueOfPennRelation(String str) {

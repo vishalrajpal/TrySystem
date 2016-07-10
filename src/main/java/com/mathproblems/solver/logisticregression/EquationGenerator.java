@@ -101,7 +101,7 @@ public class EquationGenerator {
             sParser.printProcessedNouns(sentenceNouns);
 
             System.out.println("------Merging Nummods------");
-            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+            sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, sentenceText);
             System.out.println("------After Merging Nummods------");
             sParser.printProcessedNouns(sentenceNouns);
 
@@ -149,25 +149,43 @@ public class EquationGenerator {
             LogisticRegression best =  LogisticRegression.predictSingleSentence(featureString, allClassifiers, classToLabel);
 
             int predictedLabel = best.getTargetClass();
-            if(g.noOfQuantities() != 0 && (predictedLabel==3 || predictedLabel==4)) {
+
+            if(g.noOfQuantities() == 0 && predictedLabel != 4) {
+                continue;
+            }
+
+            /*if(g.noOfQuantities() != 0 && (predictedLabel==3 || predictedLabel==4)) {
                 predictedLabel = classToLabel.get(1) > classToLabel.get(2) ? 1 : 2;
             } else if(g.noOfQuantities() == 0 && (predictedLabel==1 || predictedLabel==2)) {
                 predictedLabel = classToLabel.get(3) > classToLabel.get(4) ? 3 : 4;
-            }
+            }*/
 
             if(predictedLabel == 3) {
-                equationBuilder.append(" X");
-            } else if(predictedLabel == 4) {
-                if(adjectives.size() > 0) {
-                    for(Noun n: sentenceNouns) {
-                        if(n.getRelation().equals(PennRelation.dobj) || n.getRelation().equals(PennRelation.nsubj) || n.getRelation().equals(PennRelation.nsubjpass)) {
-                            nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
-                            break;
+                //equationBuilder.append(" X");
+                for (Noun n : sentenceNouns) {
+                    if (n.getQuantity() != 0) {
+                        nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                        int sign = 1;
+                        equationBuilder.append(LogisticRegression.numberToOperatorMap.get(predictedLabel) + n.toSmartString() + " ");
+                        if(LogisticRegression.numberToOperatorMap.get(predictedLabel).equals("+")) {
+                            sign = -sign;
                         }
+                        result = result + (sign * n.getQuantity());
                     }
+                }
+
+
+            } else if(predictedLabel == 4) {
+
+                for(Noun n: sentenceNouns) {
+                    if(n.getRelation().equals(PennRelation.dobj) || n.getRelation().equals(PennRelation.nsubj) || n.getRelation().equals(PennRelation.nsubjpass)) {
+                        nounToPredictedLabel.put(n, LogisticRegression.numberToOperatorMap.get(predictedLabel));
+                        break;
+                    }
+                }
                     /*Noun questionNoun = new Noun(adjectives.get(0).getDependency());
                     nounToPredictedLabel.put(questionNoun, LogisticRegression.numberToOperatorMap.get(predictedLabel));*/
-                }
+
                 equationBuilder.append("= ?");
             } else {
                 for (Noun n : sentenceNouns) {
@@ -208,16 +226,50 @@ public class EquationGenerator {
             }
         }
 
+        boolean answerFound = false;
         if(questionEntry != null) {
             for (Map.Entry<Noun, String> entry : nounToPredictedLabel.entrySet()) {
                 Noun entryNoun = entry.getKey();
                 String entryLabel = entry.getValue();
                 entryNoun.initializeRelatedNouns(entryLabel);
                 if (entryNoun.relateNounToAnswerIfMatches(questionEntry, false)) {
-                    System.out.println("Answer from related nouns:" + entryNoun.getAnswer());
+                    double answer = entryNoun.getAnswer();
+                    System.out.println("Answer from related nouns:" + answer);
+                    if(answer != 0) {
+                        answerFound = true;
+                    }
                     break;
                 }
             }
+        }
+
+        if (!answerFound) {
+            double answerFromPrevEntities = 0.0;
+            double answerFromRightHandSidePrevEntities = 0.0;
+            int sign;
+            for (Map.Entry<Noun, String> entry : nounToPredictedLabel.entrySet()) {
+                sign = 1;
+                String predictedLabel = entry.getValue();
+                Noun n = entry.getKey();
+                int currentClass = LogisticRegression.operatorToNumberMap.get(predictedLabel);
+                if (currentClass == 2) {
+                    sign = -sign;
+                } else if(currentClass == 3) {
+                    answerFromRightHandSidePrevEntities = answerFromRightHandSidePrevEntities + n.getQuantity();
+                }
+
+                if(currentClass != 3) {
+                    answerFromPrevEntities = answerFromPrevEntities + (sign * n.getQuantity());
+                }
+            }
+
+            if(answerFromRightHandSidePrevEntities != 0.0) {
+                double max = Math.max(answerFromPrevEntities, answerFromRightHandSidePrevEntities);
+                double min = Math.min(answerFromPrevEntities, answerFromRightHandSidePrevEntities);
+                answerFromPrevEntities = max - min;
+            }
+
+            System.out.println("Answer from previous reference entities:" + answerFromPrevEntities);
         }
     }
 
@@ -259,7 +311,7 @@ public class EquationGenerator {
                 sParser.printProcessedNouns(sentenceNouns);
 
                 System.out.println("------Merging Nummods------");
-                sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns);
+                sParser.mergeNummodsWithParsedNouns(sentenceDependencies, sentenceNouns, currentSentenceString);
                 System.out.println("------After Merging Nummods------");
                 sParser.printProcessedNouns(sentenceNouns);
 

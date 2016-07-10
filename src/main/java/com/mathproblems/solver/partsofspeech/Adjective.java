@@ -1,7 +1,9 @@
 package com.mathproblems.solver.partsofspeech;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.mathproblems.solver.PennPOSTags;
 import com.mathproblems.solver.PennRelation;
@@ -86,5 +88,9 @@ public class Adjective implements PartsOfSpeech {
 
 	public String getDependentWithQuantity() {
 		return getDependent();
+	}
+
+	public Set<Integer> getIndices() {
+		return new HashSet<>();
 	}
 }

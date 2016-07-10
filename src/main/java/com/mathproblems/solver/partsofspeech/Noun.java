@@ -10,19 +10,51 @@ import edu.stanford.nlp.trees.TypedDependency;
 public class Noun implements PartsOfSpeech {
 
 	private String dependent;
-	private final PennPOSTags nounType;
+	private PennPOSTags nounType;
 	private final PennRelation relation;
 	private final TypedDependency dependency;
-	private final int dependentIndex;
+	private int dependentIndex;
 	private int governerIndex;
-	private final SortedSet<PartsOfSpeech> mergedCompounds;
+	private SortedSet<PartsOfSpeech> mergedCompounds;
 	private String governer;
 	private double quantity;
-	private final Map<String, Integer> relatedNouns;
-	private final LinkedHashSet<Preposition> prepositions;
-	private final SortedSet<Integer> indices;
+	private Map<String, Integer> relatedNouns;
+	private LinkedHashSet<Preposition> prepositions;
+	private SortedSet<Integer> indices;
 	private StringBuilder suffixString;
 	private String sentenceText;
+
+	public Noun(TypedDependency dependency, String sentenceText, PennRelation relation) {
+		this.dependency = dependency;
+		this.sentenceText=sentenceText;
+		this.relation = relation;
+		if(relation.equals(PennRelation.nummod)) {
+			this.dependent = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			this.dependentIndex = dependency.gov().index();
+			this.governer = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			this.governerIndex = dependency.dep().index();
+
+			nounType = PennPOSTags.valueOf(dependency.gov().tag());
+			mergedCompounds = new TreeSet<PartsOfSpeech>(new Comparator<PartsOfSpeech>() {
+				public int compare(PartsOfSpeech o1, PartsOfSpeech o2) {
+					return o1.getDependentIndex() - o2.getDependentIndex();
+				}
+			});
+
+			relatedNouns = new LinkedHashMap<>();
+			relatedNouns.put(dependent, dependentIndex);
+			indices = new TreeSet<>();
+			indices.add(dependentIndex);
+			suffixString = new StringBuilder();
+			prepositions = new LinkedHashSet<>();
+
+			if(isANumber(governer)) {
+				associateQuantity(governer);
+			}
+			mergedCompounds.add(this);
+		}
+	}
+
 	public Noun (TypedDependency dependency, String sentenceText, Collection<TypedDependency> dependencies) {
 		this.dependency = dependency;
 		this.sentenceText=sentenceText;
@@ -75,7 +107,7 @@ public class Noun implements PartsOfSpeech {
 //Jason found 49 seashells on the beach . He gave 13 of the seashells to Tim . How many seashells does Jason now have ?
 	private boolean isANumber(String str) {
 		try {
-			Integer.parseInt(str);
+			Double.parseDouble(str);
 			return true;
 		} catch(Exception e) {
 			return false;
@@ -250,16 +282,29 @@ public class Noun implements PartsOfSpeech {
 		}
 
 		double mergedResult = 0.0;
-
+		double rightHandSideMergedResult = 0.0;
 		for (Map.Entry<Noun, String> relatedAnswerMergedNoun : relatedAnswerMergedNouns.entrySet()) {
 			sign = 1;
 			String predictedLabel = relatedAnswerMergedNoun.getValue();
 			Noun n = relatedAnswerMergedNoun.getKey();
-			if (LogisticRegression.operatorToNumberMap.get(predictedLabel) == 2) {
+			int currentClass = LogisticRegression.operatorToNumberMap.get(predictedLabel);
+			if (currentClass == 2) {
 				sign = -sign;
+			} else if(currentClass == 3) {
+				rightHandSideMergedResult = rightHandSideMergedResult + n.getQuantity();
 			}
-			mergedResult = mergedResult + (sign * n.getQuantity());
+
+			if(currentClass != 3) {
+				mergedResult = mergedResult + (sign * n.getQuantity());
+			}
 		}
+
+		if(rightHandSideMergedResult != 0.0) {
+			double max = Math.max(mergedResult, rightHandSideMergedResult);
+			double min = Math.min(mergedResult, rightHandSideMergedResult);
+			mergedResult = max - min;
+		}
+
 		System.out.println("Answer from merged nouns:" + mergedResult);
 		return result;
 	}

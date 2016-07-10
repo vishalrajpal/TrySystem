@@ -1,0 +1,55 @@
++;A pet store had 13 siamese cats and 5 house cats.
++;Amy had 4 music files and 21 video files on her flash drive.
++;At the schools book fair Sam bought 13 adventure books and 17 mystery books.
++;Tiffany was playing a video game and had 43 lives.
++;If she got 27 more lives in the next level, how many lives would she have?
++;While shopping, Maria bought 35 green towels and 21 white towels.
++;A waiter at 'The Greasy Spoon' restaurant had 29 customers to wait on.
++;During the lunch rush he added another 20 customers.
++;Sara has 31 red and 15 green balloons .
++;Sandy has 24 red balloons .
++;Joan has 10 books .
++;Tom has 38 books .
++;There are 46 rulers in the drawer .
++;A ship is filled with 5973 tons of cargo .
++;It stops in the Bahamas , where sailors load 8723 tons of cargo onboard .
++;Before December , customers buy 1346 ear muffs from the mall .
++;During December , they buy 6444 , and there are none .
++;A car company produced 3884 cars in North America and 2871 cars in Europe .
++;There were originally 20817 houses in Lincoln County .
++;During a housing boom , developers built 97741 .
++;On a hot day , Sam poured 1 bucket of water into a plastic wading pool .
++;A few minutes later he added another 8.8 buckets .
++;Terrell hiked 8.2 miles on Saturday .
++;Then , on Sunday , he hiked another 1.6 miles .
++;Pamela bought 9.8 ounces of sugar.
++;Tori was 4.4 feet tall .
++;Then she grew 2.86 feet taller .
++;Jose starts with 7 bottle caps.
++;He gets 2 more from Rebecca.
++;Mike had 89 bags.
+-;During a sale they sold 10 cats.
+-;If she deleted 23 of the files.
+-;If 15 of the books were used, how many new books did he buy?
+-;In a hard part of the game she lost 14 lives.
+-;If she gave her mother 34 of them, how many towels did Maria end up with?
+-;If 34 of the customers didn't leave him a tip, how many customers did leave a tip?
+-;Tim took 25 rulers from the drawer .
+-;He gave some to Tyson.
+=;She spilled 5.2 ounces of it on the floor .
+=;He now has 21 left?
+?;How many cats do they have left?
+?;How many files were still on her flash drive?
+?;How many red balloons do they have in total ?
+?;How many books do they have together ?
+?;How many rulers are now in the drawer ?
+?;How many tons of cargo does the ship hold now ?
+?;In all , how many ear muffs do the customers buy ?
+?;How many cars is that in all ?
+?;How many houses are there now in Lincoln County ?
+?;How much water did Sam pour into the pool ?
+?;How far did Terrell hike all together ?
+?;How much sugar is remaining?
+?;How tall is Tori now ?
+?;How many bottle caps does Jose end with?
+?;How many bags did he give to Tyson?

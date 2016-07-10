@@ -6,6 +6,8 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.trees.TypedDependency;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Preposition implements PartsOfSpeech {
 
@@ -79,5 +81,9 @@ public class Preposition implements PartsOfSpeech {
 
     public String getDependentWithQuantity() {
         return getDependent();
+    }
+
+    public Set<Integer> getIndices() {
+        return new HashSet<>();
     }
 }

@@ -1,0 +1,301 @@
++;Joan found 70 seashells on the beach.
++;There were 28 bales of hay in the barn.
++;Tim stacked more bales in the barn today.
++;Mary is baking a cake.
++;The recipe wants 8 cups of flour.
++;Sara's high school played 12 basketball games this year.
++;There are 22 walnut trees currently in the park.
++;Park workers will plant more walnut trees today.
++;Sandy grew 6 carrots.
++;Sam grew 3 carrots.
++;Tim's cat had kittens.
++;Melanie had 7 dimes in her bank.
++;Her dad gave her 8 dimes and her mother gave her 4 dimes.
++;Melanie picked 4 plums, Dan picked 9 plums, and Sally picked 3 plums from the plum tree.
++;Keith has 20 books.
++;Jason has 21 books.
++;Jason had 49 quarters in his bank.
++;There are 41 pencils in the drawer.
++;Mike placed 30 more pencils in the drawer.
++;Fred grew 38 cantelopes.
++;Tim grew 44 cantelopes.
++;Mike has 35 books in his library.
++;He bought several books at a yard sale over the weekend.
++;Sandy is baking a cake.
++;The recipe wants 7 cups of flour.
++;There were a total of 7 football games this year.
++;A restaurant served 6 cakes during lunch and 9 during dinner today.
++;Fred had 7 dimes in his bank.
++;Joan's cat had 8 kittens.
++;There are 34 dogwood trees currently in the park.
++;Park workers will plant 49 more dogwood trees today.
++;Mike has 87 baseball cards.
++;Tim has 44 books.
++;Sam has 52 books.
++;Alyssa picked 42 pears and Nancy picked 17 pears from the pear tree.
++;Sam had 98 pennies in his bank.
++;Melanie's high school played 64 soccer games this year.
++;Mary picked 122 oranges and Jason picked 105 oranges from the orange tree.
++;Sally had 760 quarters in her bank.
++;Melanie grew 139 turnips.
++;Benny grew 113 turnips.
++;Jason has 3 Pokemon cards.
++;Mike has 8 orange marbles.
++;Joan had 5 dimes in her bank.
++;Sara picked 6 pears and Tim picked 5 pears from the pear tree.
++;Jason had Pokemon cards.
++;Mary had 7 nickels in her bank.
++;Her dad gave her 5 more nickels.
++;Mary has 9 yellow marbles Joan has 3 yellow marbles.
++;Sally grew 6 carrots.
++;Fred grew 4 carrots.
++;Tom found 5 seashells on the beach.
++;Fred has 5 baseball cards.
++;Mary had 8 potatoes in the garden.
++;There were a total of 6 soccer games this year.
++;There are 9 oak trees currently in the park.
++;Jessica had 8 quarters in her bank.
++;A restaurant made 9 hamburgers to serve during lunch.
++;There are 7 crayons in the drawer.
++;Dan picked 9 limes and gave Sara 4 of the limes.
++;Alyssa's high school played 31 hockey games this year.
++;How many hockey games did Alyssa miss?
++;Tom has 30 violet balloons.
++;Fred has 40 baseball cards.
++;Fred found 47 seashells on the beach.
++;Joan decided to sell all of her old books.
++;She gathered up 33 books to sell.
++;There are 46 rulers in the drawer.
++;There are 33 oak trees currently in the park.
++;Luke had 20 stickers.
++;He bought 12 stickers from a store in the mall and got 20 stickers for his birthday.
++;Johnny saved $30 in September.
++;He saved $49 in October and $46 in November.
++;Mary has 9 yellow marbles.
++;Joan has 3 yellow marbles.
++;Jason had Pokemon cards.
++;He already has 7 chocolate cupcakes and 19 vanilla cupcakes.
++;A bucket contains 3 gallons of water.
++;If Derek adds 6.8 gallons more, how many gallons will there be in all?
++;A farmer started the day with 8.75 buckets of seeds.
++;Paco had 93 cookies.
++;Connie had some marbles.
++;Lucy has an aquarium with 212 fish.
++;Lucy wants to buy 68 more fish.
++;Connie has 2315 red markers and 1028 blue markers.
++;There were 6 roses in the vase.
++;Sam had 9 dimes in his bank.
++;His dad gave him 7 more dimes.
++;Sara had 21 quarters in her bank.
++;Her dad gave her 49 quarters.
++;Joan has 10 books.
++;Tom has 38 books.
++;Joan has 40 blue balloons.
++;Melanie has 41 blue balloons.
++;Sally had 27 Pokemon cards.
++;Dan gave her 41 new Pokemon cards.
++;Sally bought 20 Pokemon cards.
++;Mike has 35 books in his library.
++;He bought several books at a yard sale over the weekend.
++;Sally had 13 peaches at her roadside fruit dish.
++;She went to the orchard and picked peaches to stock up.
++;Nancy grew 6 potatoes.
++;Sandy grew 7 potatoes.
++;There are 9 crayons in the drawer .
++;Benny placed 3 crayons in the drawer .
++;There are 5 oak trees currently in the park .
++;Park workers will plant 4 oak trees today .
++;Fred had 7 dimes in his bank.
++;Joan's cat had 8 kittens .
++;There are 34 dogwood trees currently in the park .
++;Park workers will plant 49 dogwood trees today .
++;There are 27 pencils in the drawer .
++;Nancy placed 45 pencils in the drawer .
++;Sam found 35 seashells on the beach.
++;Mike has 87 baseball cards .
++;Sandy grew 51 pumpkins .
++;Mike grew 23 pumpkins .
++;Dan has 64 violet marbles .
++;There are 25 popular trees currently in the park .
++;Park workers will plant 73 popular trees today .
++;There are 54 scissors in the drawer .
++;Keith placed 22 scissors in the drawer .
++;Alyssa picked 42 pears.
++;Nancy picked 17 pears from the pear tree .
++;Sam had 98 pennies in his bank .
++;Sally had 760 quarters in her bank .
++;Fred has 709 green balloons.
++;Jason has 3 Pokemon cards .
++;Mary had 7 nickels in her bank .
++;Her dad gave her 5 nickels .
++;Fred has 5 baseball cards .
++;Mary had 8 potatoes in the garden .
++;Jessica had 8 quarters in her bank .
++;A restaurant made 9 hamburgers to serve during lunch .
++;There are 7 crayons in the drawer .
++;Fred found 47 seashells on the beach.
++;She gathered up 33 books to sell .
+-;she gave Sam some of her seashells.
+-;She already put in 2 cups.
+-;The team won most of their games.
+-;He gave 3 to Jessica and 6 to Sara.
+-;Jason gave 25 quarters to his dad.
+-;She already put in 4 cups.
+-;Melanie missed 4 of the games.
+-;His sister borrowed 3 of his dimes.
+-;She gave 2 to her friends.
+-;Sam bought 13 of Mike's baseball cards.
+-;He spent 93 of his pennies.
+-;She attended 32 games.
+-;She spent 418 of her quarters.
+-;Benny bought 2 of Jason's  Pokemon cards.
+-;He gave Sam 4 of the marbles.
+-;She spent 2 of her dimes.
+-;He gave 9 Pokemon cards to his friends.
+-;He gave Jessica 2 of the seashells.
+-;Melanie bought 3 of Fred's baseball cards.
+-;The rabbits ate 3 of the potatoes.
+-;the rabbits ate 23 potatoes.
+-;Jessica missed 4 of the games.
+-;Park workers had to cut down 2  oak trees that were damaged.
+-;Her sister borrowed 3 of her quarters.
+-;Only 3 were  actually served.
+-;Mary took 3 crayons out of the drawer.
+-;She attended 13 games.
+-;He gave Fred 16 of the balloons.
+-;Keith bought 22 of Fred's baseball cards.
+-;He gave Jessica 25 of the seashells.
+-;She sold 26 books in a yard sale.
+-;Tim took 25  rulers from the drawer.
+-;Park workers had to cut down  18 oak trees that were damaged.
+-;Then Luke gave 5 of the stickers to his sister and used 8 to decorate a greeting card.
+-;Then Johnny spent $58 on a video game.
+-;Jason gave 9 to his friends.
+-;How many more cupcakes should Randy buy?
+-;After spending the morning sowing seeds, she now has 6 buckets left.
+-;Paco ate 15 of them.
+-;Connie gave 183 to Juan.
+-;Mary cut some more roses from her flower garden.
+-;His sister borrowed 3 of his dimes.
+-;She gave 2 to her friends .
+-;He gave Joan 18 of the seashells .
+-;Sam bought 13 of Mike's baseball cards .
+-;He gave Mary 14 of the marbles .
+-;He spent 93 of his pennies .
+-;She spent 418 of her quarters .
+-;He gave Sandy 221 of the balloons .
+-;Benny bought 2 of Jason 's Pokemon cards .
+-;Melanie bought 3 of Fred 's baseball cards .
+-;The rabbits ate 3 of the potatoes .
+-;Her sister borrowed 3 of her quarters .
+-;Only 3 were actually served .
+-;Mary took 3 crayons out of the drawer .
+-;He gave Jessica 25 of the seashells .
+-;She sold 26 books in a yard sale .
+=;She has 27 seashell left.
+=;There are now 54 bales of hay in the barn.
+=;They were defeated during 4 games.
+=;When the workers are finished there will be 55 walnut trees in the park.
+=;He now has 9 kittens left.
+=;He now has 56 books in his library.
+=;He now has 4 Pokemon cards left.
+=;Jason now has 4 Pokemon cards left.
+=;Randy needs 53 cupcakes for a birthday party.
+=;Now Connie has 593 marbles left.
+=;There are now 16 roses in the vase.
+=;He now has 56 books in his library.
+=;There are now 55 peaches.
+?;How many seashells did she give to Sam?
+?;How many bales did he store in the barn?
+?;How many more cups does she need to add?
+?;How many games did they win?
+?;How many walnut trees did the workers plant today?
+?;How many carrots did they grow in total?
+?;How many kittens did he have to start with?
+?;How many dimes does Melanie have now?
+?;How many plums were picked in total?
+?;How many books do they have together?
+?;How many quarters does he have now?
+?;How many pencils are now there in total?
+?;How many cantelopes did they grow in total?
+?;How many books did he buy at the yard sale?
+?;How many more cups does she need to add?
+?;How many football games did Melanie go to in all?
+?;How many cakes were served today?
+?;How many dimes does Fred have now?
+?;How many kittens does she have now?
+?;How many dogwood trees will the park have when the workers are finished?
+?;How many baseball cards does Mike have now?
+?;How many books do they have together?
+?;How many pears were picked in all?
+?;How many pennies does he have now?
+?;How many soccer games did Melanie miss?
+?;How many oranges were picked in total?
+?;How many quarters does she have now?
+?;How many turnips did they grow in all?
+?;How many Pokemon cards does Jason have now ?
+?;How many orange marbles does he now have ?
+?;How many dimes does she have now ?
+?;How many pears were picked in total?
+?;How many Pokemon cards did he have to start with?
+?;How many nickels does Mary have now ?
+?;How many yellow marbles do they have in all ?
+?;How many carrots did they grow in all?
+?;How many seashells does he now have?
+?;How many baseball cards does Fred have now?
+?;How many potatoes does Mary now have ?
+?;How many soccer games did Jessica go to in all?
+?;How many oak trees will the park have when the workers are finished?
+?;How many quarters does Jessica have now?
+?;How many hamburgers were left over from lunch?
+?;How many crayons are there now?
+?;How many limes does Dan have now?
+?;How many violet balloons does he now have?
+?;How many baseball cards does Fred have now?
+?;How many seashells does he now have?
+?;How many books does Joan now have?
+?;How many rulers are now in the drawer?
+?;How many oak trees will be in the park when the workers are finished?
+?;How many stickers does Luke have left?
+?;How much money does Johnny have left?
+?;How many yellow marbles do they have in all ?
+?;How many Pokemon cards did Jason have to start with ?
+?;How many buckets of seeds did the farmer sow?
+?;How many cookies did Paco have left?
+?;How many did Connie have to start with?
+?;How many fish would Lucy have then?
+?;How many markers does Connie have altogether?
+?;How many roses did she cut ?
+?;How many dimes does Sam have now ?
+?;How many quarters does she have now ?
+?;How many books do they have together ?
+?;How many blue balloons do they have in total ?
+?;How many Pokemon cards does Sally have now?
+?;How many books did he buy at the yard sale?
+?;how many did she pick?
+?;How many potatoes did they grow in total?
+?;How many crayons are now there in total ?
+?;How many oak trees will the park have when the workers are finished ?
+?;How many dimes does Fred have now ?
+?;How many kittens does she have now ?
+?;How many dogwood trees will the park have when the workers are finished ?
+?;How many pencils are now there in total ?
+?;How many seashells does he now have ?
+?;How many baseball cards does Mike have now ?
+?;How many pumpkins did they grow in total ?
+?;How many violet marbles does he now have ?
+?;How many popular trees will the park have when the workers are finished ?
+?;How many scissors are now there in all ?
+?;How many pears were picked in all ?
+?;How many pennies does he have now ?
+?;How many quarters does she have now ?
+?;How many green balloons does he now have ?
+?;How many Pokemon cards does Jason have now ?
+?;How many nickels does Mary have now ?
+?;How many baseball cards does Fred have now ?
+?;How many potatoes does Mary now have ?
+?;How many quarters does Jessica have now ?
+?;How many hamburgers were over from lunch ?
+?;How many crayons are there now ?
+?;How many seashells does he now have ?
+?;How many books does Joan now have ?

@@ -16,6 +16,7 @@ public class PennPOSTagsLists {
 		PENN_NOUN_TAGS.add(PennPOSTags.CD);
 		PENN_NOUN_TAGS.add(PennPOSTags.PRP$);
 		PENN_NOUN_TAGS.add(PennPOSTags.PRP);
+		PENN_NOUN_TAGS.add(PennPOSTags.$);
 
 		PENN_ADJECTIVE_TAGS.add(PennPOSTags.JJ);
 		PENN_ADJECTIVE_TAGS.add(PennPOSTags.$);

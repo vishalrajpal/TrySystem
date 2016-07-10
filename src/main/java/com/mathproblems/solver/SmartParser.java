@@ -265,20 +265,24 @@ public class SmartParser {
         nounList.removeAll(toRemove);
 	}
 	
-	public void mergeNummodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList) {
+	public void mergeNummodsWithParsedNouns(Collection<TypedDependency> dependencies, Collection<Noun> nounList, String sentenceText) {
 		//String dependencyGoverner;
 		List<TypedDependency> numMods = getAllNummods(dependencies);
+		boolean matchFound;
 		for(TypedDependency dependency: numMods) {
-			//dependencyGoverner = dependency.gov().originalText();
-			//dependencyGoverner = dependency.gov().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
+			matchFound = false;
 			for(Noun n: nounList) {
 				//if(dependencyGoverner.equals(n.getDependent()) && dependency.gov().index() == n.getDependentIndex()) {
 				if(n.getIndices().contains(dependency.gov().index())) {
 					String dep = dependency.dep().backingLabel().getString(edu.stanford.nlp.ling.CoreAnnotations.ValueAnnotation.class);
 					n.associateQuantity(dep);
+					matchFound = true;
 				}
 			}
-			
+
+			if(!matchFound) {
+				nounList.add(new Noun(dependency, sentenceText, PennRelation.nummod));
+			}
 		}
 	}
 
@@ -455,6 +459,14 @@ public class SmartParser {
 		Pattern p = Pattern.compile("(some|most|several)");
 		Matcher m = p.matcher(sentence.toLowerCase());
 		featureVector.put(LogisticRegression.CONTAINS_UNKNOWN_QUANTITY_WORDS_STRING.hashCode(), m.find() ? 1.0 : 0.0);
+
+		Pattern nowPattern = Pattern.compile("\\b(now)\\b");
+		Matcher nowMatcher = nowPattern.matcher(sentence.toLowerCase());
+		featureVector.put(LogisticRegression.CONTAINS_WORD_NOW_STRING.hashCode(), nowMatcher.find() ? 1.0 : 0.0);
+
+		Pattern onPattern = Pattern.compile("\\b(on)\\b");
+		Matcher onMatcher = onPattern.matcher(sentence.toLowerCase());
+		featureVector.put(LogisticRegression.CONTAINS_WORD_ON_STRING.hashCode(), onMatcher.find() ? 1.0 : 0.0);
 
 		/**one-hot encoding for verbs */
 		for(String category: SVMClassifier.importantCategories) {
