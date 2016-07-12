@@ -4,6 +4,7 @@
 \usepackage{url}
 \usepackage{wrapfig}
 \usepackage{graphicx}
+\usepackage{array}
 \graphicspath{ {images/} }
 %\bibliographystyle{acl}
 %\bibliography{coling2016}
@@ -95,10 +96,9 @@ Based on our analysis we found that having a count of some important things in t
 
 \subsubsection{Occurrence based Features}
 \paragraph{Relation based Occurrence Features}
-We use the occurrence of some dependency relations as features. Particularly nmod:poss relation from the dependency parser if set can determine the subject possessing the object and nmod:of which helps to differentiate between two nouns of same kind.
-
+We use the occurrence of some dependency relations as features. Particularly nmod:poss relation from the dependency parser if set can determine the subject possessing the object and nmod:of which helps to differentiate between two nouns of same kind. The relations in the sentence depict its structure and to simplify the sentences the properties of its structure prove to be helpful.
 \paragraph{Pattern based Occurrence Features}
-Occurrence of some specific syntactic pattern as a sub pattern of the syntactic pattern of a sentence can also be helpful. We have 2 features: NVQN syntactic pattern and QN syntactic pattern. These two patterns indicate that a sentence of such pattern is mostly suggesting addition or subtraction.
+Occurrence of some specific syntactic pattern as a sub pattern of the syntactic pattern of a sentence can also be helpful. We have 2 features: NVQN syntactic pattern and QN syntactic pattern. These two patterns indicate that a sentence of such pattern is mostly suggesting addition or subtraction. Since we are trying to simplify the sentences to a similar pattern, they prove to distinctive features between quantified classes("+", "-") and other classes("=", "?"). 
 
 \paragraph{Word based Occurrence Features}
 Some specific words allow the classifier to predict more accurately. The word "now" is suggesting a result after some operation and hence the predicted operator should be "=". Similarly, occurrence of one of the words from "most", "some" and "several" suggests an unknown quantity in the sentence. There are different such words through which we can predict the operation and hence we use the occurrence of such words as features.
@@ -109,13 +109,87 @@ We identified 8 word categories from WordNet and Word2Vec which can be helpful i
 \subsection{Training the Classifier to Predict Operator}
 At this point we only consider addition subtraction problems but based on our approach and analysis we believe it is generalizable to multiplication and division problems. The possible operators in our system currently are "+", "-", "=" and "?". The "+" operator and "-" are self explanatory, whereas a sentence classified as "=" is suggesting that the quantity in the sentence is a result of some operations and a sentence classified as "?" is suggesting that the sentence is asking a question about some entity.
 
-We train four Logistic Regression binary classifiers for each of the above mentioned operators. We then use one vs all technique to combine the results from these binary classifiers. Our test data contain 55 simplified sentences and the accuracy is as follows:
+We train four Logistic Regression binary classifiers for each of the above mentioned operators. We then use one vs all technique to combine the results from these binary classifiers. Our test data contain 55 simplified sentences. The below table consists of the precision and recall for all the 4 classes:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\bf Operator & \bf No. of instances & \bf Precision & \bf Recall \\
+\hline
++ & 30 & 84\% & 70\% \\
+\hline
+- & 8 & 30\% & 37.5\% \\
+\hline
+= & 2 & 33.33\% & 50\% \\
+\hline
+? & 15 & 88.23\% & 100\% \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{precision-recall-table} Precision and Recall}
+\end{table}
+
+Based on the results above, it is clear that operator "?" had some specific features such as presence of WH-adverb which made it easy for the classifier to predict question sentences correctly. Preposition occurrence features provided distinctive information to the classifier for operator "+". Operator "-" is entirely dependent on verb features and some preposition occurrence features such as presence of preposition "from". Whereas operator "=" is dependent on some specific word occurrence features such as now. Below is an example of some sentences classified correctly:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\bf Sentence & \bf Actual Operator & \bf Classified Operator\\
+\hline
+Sandy has 24 red balloons. & + & +\\
+\hline
+He took 20 seashells from Joan. & - & -\\
+\hline
+He now has 21 left. & = & =\\
+\hline
+How much sugar is remaining? & ? & ?\\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{prediction-example-table} Example Sentences}
+\end{table}
 
 %Should we have precision and recall?%
 
-\subsection{Using Quantified Noun in the Equation}
-Based on the information extracted and the operator to which the sentence is classified, an equation is created or modified either by adding quantified nouns to the equation with its operator or an unknown quantity which needs to be calculated. For Example: The equation based on the extracted information for "Joan has 20 dollars. She gave 10 dollars to his friend. How many dollars does she have now?" will be +20 - 10 = ?.
+\subsection{Building and Solving Equation}
 
+Based on the operator prediction for a single simplified sentence from the classifier, the quantified noun from sentence is extracted with the predicted label. When our system encounters a sentence predicted as "?" it extracts the Noun for which the computation needs to be done. All the other sentences are looked for similarity with this entity and are merged into an coherent whole equation if they are similar. Below is an example of an equation generated by our system:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|>{\centering\arraybackslash}m{8cm}|>{\centering\arraybackslash}m{6cm}|}
+\hline
+\bf Problem Text & \bf Equation Generated by our system\\
+\hline
+Sandy grew 6 carrots . Sam grew 3 carrots . How many carrots did they grow in total ? & +6 carrots +3 carrots = ? carrots\\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{equation-example-table} Example Problem Text and Equation}
+\end{table}
+
+\section{Experimental Results}
+
+We evaluate our system on publicly available datasets of arithmetic word problems in this section. %Should write more%
+
+\subsection{Datasets}
+We evaluate our system on 3 publicly available datasets. 
+
+\subsubsection{A12 Dataset}
+This dataset consists of 395 addition and subtraction problems, released by ~\cite{Hosseini:14}. They performed a 3-fold cross validation and each fold consists of problems from different sources. We evaluate our system on this dataset with the same settings and report our results.
+
+\subsubsection{IL Dataset}
+This dataset consists of 562 problems released by {Roy:15}. We only evaluate on the addition and subtraction problems for now as our system is able to solve addition and subtraction problems.
+
+\subsubsection{Commoncore Dataset}
+This dataset consists of 600 problems among which there are 200 addition and subtraction problems. We evaluate our system on these 200 questions and report our results. 
+\section{Discussion}
+\subsection{Future Work}
+\subsection{Detailed Error Analysis}
+
+\section{Conclusion}
 \begin{thebibliography}{}
   
   \bibitem[\protect\citename{Hosseini \bgroup et al.\egroup}2014]{Hosseini:14}
