@@ -51,7 +51,7 @@ We gather information form the sentences by parsing the sentence using the depen
 \caption{\label{fig:Figure2}Example sentence of a word problem and its simplification.}
 \end{figure}
 
-Simplifying the sentences to such format makes it less complex for the classifier to predict an operator corresponding to the sentence as well as to it makes things trivial to generate equations. Though the training data seems to be the sentences, actually the sentences in the training data are just a way to generate syntactic patterns which are used extensively as the features to the classifier. A large number of sentences will end up having the same syntactic pattern. Hence, training is actually on syntactic patterns and not on raw text.
+Simplifying the sentences to such format makes it less complex for the classifier to predict an operator corresponding to the sentence as well as it makes things trivial to generate equations. Though the training data seems to be the sentences, actually the sentences in the training data are just a way to generate syntactic patterns which are used extensively as the features to the classifier. A large number of sentences will end up having the same syntactic pattern. Hence, training is actually on syntactic patterns and not on raw text.
 
 Our system learns this classifier based on 300 individual sentences. Our data and source code are publicly available \footnote{Source code and training dataset is available at \url{https://github.com/vishalrajpal/TrySystem}.}. The next section describes how we extract the syntactic pattern, its usage and problem decomposition.
 
@@ -92,7 +92,7 @@ At this point, the sentences are simplified at the most granular level. Since, e
 All the syntactic patterns extracted from the training data are used as individual features. The syntactic pattern to which the sentence belongs is set and all the other are not in a one-hot encoding way. From the training data of 300 sentences, we extracted near to 125 syntactic patterns, which shows that multiple sentences have a similar syntactic pattern. For test data, even if we haven't seen a pattern before the other features as described below will try to map the syntactic pattern found to the existing syntactic pattern. 
 
 \subsubsection{Count based Features}
-Based on our analysis we found that having a count of some important things in the syntactic pattern proves to be helpful in to the classifier in learning accurately. There are 4 count based features: number of nouns, number of prepositions, number of verbs and number of quantities. These features depend on how we map the sentence to a syntactic pattern and as explained above if we map the sentence to the correct syntactic pattern, extracting these kind of features is a trivial task.
+Based on our analysis we found that having a count of some important things in the syntactic pattern proves to be helpful to the classifier in learning accurately. There are 4 count based features: number of nouns, number of prepositions, number of verbs and number of quantities. These features depend on how we map the sentence to a syntactic pattern and as explained above if we map the sentence to the correct syntactic pattern, extracting these kind of features is a trivial task.
 
 \subsubsection{Occurrence based Features}
 \paragraph{Relation based Occurrence Features}
@@ -225,17 +225,95 @@ Our system currently employs simple rules but is able to solve arithmetic proble
 We also plan to focus on improving our classifier through some advanced methods. At this point, we have a Logistic Regression classifier which performs reasonably well. This might be an area to predict the operator more accurately. We plan to consider Ensembling in future to predict the operator for simplified sentences.
 
 \subsection{Detailed Error Analysis}
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|>{\centering\arraybackslash}m{8cm}|>{\centering\arraybackslash}m{6cm}|}
+\hline
+\bf Error Type & \bf Example \\
+\hline
+Classification Errors (75\%) & He now has 56 books in his library. \textbf{Classified to "+" but should be "="}. \\
+\hline
+Parsing Issues (15\%) & Sara has 31 \textbf{red} and 15 green balloons. \\
+\hline
+Coreference Resolution (10\%) & When they cleaned them , they discovered that \textbf{29} were cracked. \\
+\hline
+\end{tabular}
+\caption{\label{error-analysis-table} Examples of different error categories and relative frequencies.}
+\end{center}
+\end{table}
 
 \section{Conclusion}
 We present an approach to understand and solve general arithmetic problems which used sentence simplification at its core. Our system learns to predict an operator corresponding to each simplified sentence using syntactic patterns, part-of-speech features and occurrence features..The training data to the classifier are simple sentences which have a single quantified noun. Our system extracts the quantified nouns, takes other properties of the sentence into consideration and predicts an operator. The quantified noun is associated with that operator and used in the equation. This also provides ways to discard irrelevant information. The core idea of our approach is to use the basic properties of the language and simplify the task of for the classifier to predict the operator for the sentences.\newline
 Though we have simplified sentences in our training data, actually the syntactic patterns of those sentences are used to train the classifier with some limited word occurrence features. We were able to notice an improvement in parsing errors which is a prerequisite to sentence simplification.  Also, our approach generalizes to data from different domains in a better way as we only depend on the syntactic pattern of the sentence and some other properties.\newline
 
+\newpage
+
 \begin{thebibliography}{}
+  
+  \bibitem[\protect\citename{Korhonen, Anna}2002]{Anna:02}
+  Anna Korhonen
+  \newblock Assigning Verbs to Semantic Classes via WordNet
+  \newblock 2002.
+  \newblock {\em Association for Computational Linguistics}
+  
+  \bibitem[\protect\citename{Màrquez \bgroup et al. \egroup}2015]{Màrquez:15}
+  Lluís Màrquez, Chris Callison-Burch, Jian Su, Daniele Pighin and Yuval Marton
+  \newblock Solving Geometry Problems: Combining Text and Diagram Interpretation
+  \newblock 2015.
+  \newblock {\em The Association for Computational Linguistics}
+
+  \bibitem[\protect\citename{Màrquez \bgroup et al. \egroup}2015]{Màrquez:15}
+  Lluís Màrquez, Chris Callison-Burch, Jian Su, Daniele Pighin and Yuval Marton
+  \newblock Automatically Solving Number Word Problems by Semantic Parsing and Reasoning
+  \newblock 2015.
+  \newblock {\em The Association for Computational Linguistics}
+  
+  \bibitem[\protect\citename{Màrquez \bgroup et al. \egroup}2015]{Màrquez:15}
+  Lluís Màrquez, Chris Callison-Burch, Jian Su, Daniele Pighin and Yuval Marton
+  \newblock Learn to Solve Algebra Word Problems Using Quadratic Programming
+  \newblock 2015.
+  \newblock {\em The Association for Computational Linguistics}
+
+  \bibitem[Corro and Gemulla]{Corro:13}
+  Luciano Del Corro and Rainer Gemulla. 2013. 
+  \newblock ClausIE: clause-based open information extraction. 
+  \newblock In Proceedings of the 22nd international conference on World Wide Web (WWW '13). ACM, New York, NY, USA, 355-366.
   
   \bibitem[\protect\citename{Hosseini \bgroup et al.\egroup}2014]{Hosseini:14}
   Mohammad Javed Hosseini, Hannaneh Hajishirzi, Oren Etzioni and Nate Kushman.
+  \newblock Learning to Solve Arithmetic Word Problems with Verb Categorization
   \newblock 2014.
   \newblock {\em In Proceedings of the EMNLP}
+
+  \bibitem[\protect\citename{Clark \bgroup et al. \egroup}2016]{Clark:16}
+  Peter Clark, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Oyvind Tafjord, Peter D. Turney and Daniel Khashabi
+  \newblock Combining Retrieval, Statistics, and Inference to Answer Elementary Science Questions
+  \newblock 2016.
+  \newblock {\em Proceedings of the Thirtieth {AAAI} Conference on Artificial Intelligence, February 12-17, 2016, Phoenix, Arizona, {USA.}}
+  
+  \bibitem[\protect\citename{Rik \bgroup et al. \egroup}2015]{Rik:15}
+  Rik Koncel-Kedziorski , Hannaneh Hajishirzi, Ashish Sabharwal, Oren Etzioni and Siena Ang
+  \newblock Parsing Algebraic Word Problems into Equations
+  \newblock 2015.
+  \newblock {\em Transactions of the Association for Computational Linguistics}
+
+ \bibitem[\protect\citename{Roy and Roth}2015]{Roy:15}
+  Subhro Roy and Dan Roth
+  \newblock Solving General Arithmetic Word Problems
+  \newblock 2015.
+  \newblock {\em The Association for Computational Linguistics}
+  
+  \bibitem[\protect\citename{Roy \bgroup et al. \egroup}2015]{Roy:15}
+  Subhro Roy, Tim Vieira and Dan Roth
+  \newblock Reasoning about Quantities in Natural Language
+  \newblock 2015.
+  \newblock {\em Transactions of the Association for Computational Linguistics}
+    
+  \bibitem[\protect\citename{Mikolov \bgroup et al. \egroup}2013]{Mikolov:13}
+  Tomas Mikolov, Kai Chen, Greg Corrado and Jeffrey Dean
+  \newblock Efficient Estimation of Word Representations in Vector Space
+  \newblock 2013.
+  \newblock {\em CoRR}
   
 \end{thebibliography}
 

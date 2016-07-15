@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  13 JUL 2016 15:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  15 JUL 2016 11:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -257,28 +257,39 @@ LaTeX Warning: Citation `Roy: 15' on page 6 undefined on input line 204.
 LaTeX Warning: Citation `Roy:15' on page 6 undefined on input line 211.
 
 [6]
-Underfull \hbox (badness 10000) in paragraph at lines 230--232
+Underfull \hbox (badness 10000) in paragraph at lines 246--248
 
  []
 
-[7] (./PaperManuscript.aux) ) 
+[7]
+Missing character: There is no í in font ptmr7t!
+Missing character: There is no à in font ptmr7t!
+Missing character: There is no í in font ptmr7t!
+Missing character: There is no à in font ptmr7t!
+Missing character: There is no í in font ptmr7t!
+Missing character: There is no à in font ptmr7t!
+ [8] (./PaperManuscript.aux)
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
 Here is how much of TeX's memory you used:
- 1838 strings out of 493014
- 26258 string characters out of 6133351
- 87701 words of memory out of 5000000
- 5346 multiletter control sequences out of 15000+600000
+ 1845 strings out of 493014
+ 26341 string characters out of 6133351
+ 87797 words of memory out of 5000000
+ 5353 multiletter control sequences out of 15000+600000
  25813 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,10n,23p,1030b,237s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2016/texmf-dist/fonts/enc/dvip
-s/base/8r.enc}</usr/local/texlive/2016/texmf-dist/fonts/type1/urw/courier/ucrr8
-a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></us
-r/local/texlive/2016/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/te
-xlive/2016/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on PaperManuscript.pdf (7 pages, 155658 bytes).
+ 37i,10n,23p,1030b,245s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2016/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2
+016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-
+dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts
+/type1/urw/times/utmri8a.pfb>
+Output written on PaperManuscript.pdf (8 pages, 163961 bytes).
 PDF statistics:
- 54 PDF objects out of 1000 (max. 8388607)
- 32 compressed objects within 1 object stream
+ 57 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
